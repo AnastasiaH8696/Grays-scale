@@ -1,5 +1,5 @@
-#ifndef ___SEGMENT___
-#define ___SEGMENT___
+#ifndef ___TESTS___
+#define ___TESTS___
 
 /***** INCLUDES *****/
 
@@ -8,5 +8,6 @@
 /***** TYPEDEFS *****/
 
 /******************* Function Prototypes *******************/
+
 
 #endif

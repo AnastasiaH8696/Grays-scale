@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 #include "GrayImage.h"
+#include "ImagePositionList.h"
+#include "definitions.h"
 
 /***** DEFINES *****/
 
