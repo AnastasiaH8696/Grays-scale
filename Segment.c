@@ -6,6 +6,7 @@
 
 #include "GrayImage.h"
 #include "Segment.h"
+#include "definitions.h"
 
 /***** DEFINES *****/
 
