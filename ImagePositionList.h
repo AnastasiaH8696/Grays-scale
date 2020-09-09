@@ -3,11 +3,15 @@
 
 /***** INCLUDES *****/
 
+#include "definitions.h"
+
 /***** DEFINES *****/
 
 /***** TYPEDEFS *****/
 
 /******************* Function Prototypes *******************/
 
+unsigned int findAllSegments(grayImage* img, unsigned char threshold,
+	imgPosCell*** segments);
 
 #endif
