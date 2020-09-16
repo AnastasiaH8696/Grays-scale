@@ -7,13 +7,23 @@
 
 /***** TYPEDEFS *****/
 
+/**** Boolean typedef *****/
+
+typedef short BOOL;
+
+/**** Pixel typedef *****/
+
+typedef unsigned char PIXEL;
+
 /***** Gray image data structure *****/
 
 typedef struct _grayImage
 {
 	unsigned short rows, cols;
-	unsigned char** pixels;
+	PIXEL** pixels;
 } grayImage;
+
+/***** Image position typedef *****/
 
 typedef unsigned short imgPos[2];
 
