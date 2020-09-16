@@ -2,6 +2,7 @@
 #define ___SEGMENT___
 
 /***** INCLUDES *****/
+#include "definitions.h"
 
 /***** DEFINES *****/
 
