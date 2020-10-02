@@ -9,5 +9,6 @@
 /***** TYPEDEFS *****/
 
 /******************* Function Prototypes *******************/
+Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold);
 
 #endif

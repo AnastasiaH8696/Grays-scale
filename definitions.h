@@ -5,7 +5,16 @@
 
 /***** DEFINES *****/
 
+#define FALSE 0
+#define TRUE 1
+
 /***** TYPEDEFS *****/
+
+/**** unsigned typedefs *****/
+
+typedef unsigned short ushort;
+typedef unsigned int uint;
+typedef unsigned char uchar;
 
 /**** Boolean typedef *****/
 
@@ -19,7 +28,7 @@ typedef unsigned char PIXEL;
 
 typedef struct _grayImage
 {
-	unsigned short rows, cols;
+	ushort rows, cols;
 	PIXEL** pixels;
 } grayImage;
 
@@ -46,7 +55,7 @@ typedef struct _treeNode
 typedef struct _segment
 {
 	treeNode* root;
-	unsigned int size;
+	uint size;
 }Segment;
 
 /******************* Function Prototypes *******************/

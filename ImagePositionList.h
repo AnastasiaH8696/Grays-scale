@@ -11,7 +11,7 @@
 
 /******************* Function Prototypes *******************/
 
-unsigned int findAllSegments(grayImage* img, unsigned char threshold,
+uint findAllSegments(grayImage* img, unsigned char threshold,
 	imgPosCell*** segments);
 
 #endif

@@ -15,3 +15,7 @@
 /******************* Static Function Prototypes *******************/
 
 /******************* Function Implementation *******************/
+Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
+{
+	//TODO
+}
