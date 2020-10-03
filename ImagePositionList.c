@@ -16,8 +16,7 @@
 /******************* Static Function Prototypes *******************/
 
 static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag);
-static void addSegmentToArray(Segment* segment, imgPosCell*** segments, 
-	uint size, uint segmentSize);
+static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size);
 static void addToBeginningOfList(imgPosCell** nodes, imgPos* position);
 static void bubbleSort(imgPosCell* nodes);
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
@@ -28,12 +27,15 @@ static void swap(imgPosCell* maxNode, imgPosCell* minNode);
 uint findAllSegments(grayImage* img, unsigned char threshold,
 	imgPosCell*** segments)
 {
-	uint size = 0, segmentSize;
+	uint size = 0, physize = 1;
 	Segment* minSegment;
 	imgPos kernel;
 	imgPosCell* curr;
 	/*Creating a copy of our image with zeroes for tracking*/
 	PIXEL** flag = createEmptyImg(img->rows, img->cols); 
+
+	segments = (imgPosCell***)malloc(sizeof(imgPosCell**) * physize);
+	checkMemory(segments);
 	
 
 	/*The loop is running until all the segments are covered by the flag*/
@@ -43,13 +45,22 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		findMinKernel(kernel, img, flag);
 		minSegment = findSingleSegment(img, kernel, threshold);
 		curr = sortNeighbors(minSegment, flag); 
-		segmentSize = minSegment->size;
 
 		/*Adding the segment to the array*/
-		addSegmentToArray(curr, segments, size, segmentSize); //TODO: Add segment & sort it by size of single segment.
+		if (size == physize)
+		{
+			physize *= 2;
+			segments = (imgPosCell***)realloc(segments, sizeof(imgPosCell**)*physize);
+			checkMemory(segments);
+		}
+		*segments[size] = curr;
 		size++;
 	}
 
+	segments = (imgPosCell***)realloc(segments, sizeof(imgPosCell**) * size);
+	checkMemory(segments);
+
+	sortSegments(img, threshold, segments, size);
 	return size;
 }
 
@@ -128,8 +139,26 @@ static void swap(imgPosCell* maxNode, imgPosCell* minNode)
 	minNode->position[1] = tmp[1];
 }
 
-static void addSegmentToArray(Segment* segment, imgPosCell*** segments,
-	uint size, uint segmentSize)
+static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size)
 {
-	//TODO
+	ushort i, j;
+	Segment* curr;
+	Segment *next;
+	imgPosCell* temp;
+
+	for (i = 0; i < size - 1; i++)
+	{
+		for (j = 0; j < size - i - 1; j++)
+		{
+			curr = findSingleSegment(img, (*segments)[j]->position, threshold);
+			next = findSingleSegment(img, (*segments)[j+1]->position, threshold);
+
+			if (curr->size < next->size)
+			{
+				temp = (*segments)[j];
+				(*segments)[j] = (*segments)[j + 1];
+				(*segments)[j + 1] = temp;
+			}
+		}
+	}
 }
