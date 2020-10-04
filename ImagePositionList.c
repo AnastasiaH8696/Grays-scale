@@ -17,10 +17,14 @@
 
 static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag);
 static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size);
-static void addToBeginningOfList(imgPosCell** nodes, imgPos* position);
+static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL ***flag);
 static void bubbleSort(imgPosCell* nodes);
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
 static void swap(imgPosCell* maxNode, imgPosCell* minNode);
+static void addItemToArray(ushort* size, ushort* physize, imgPosCell**** segments, imgPosCell* curr);
+static void freeflag(PIXEL** flag, ushort rows);
+static void freeSegmentsArr(imgPosCell** segments, ushort size);
+static void deleteFromBeginning(imgPosCell* node);
 
 /******************* Function Implementation *******************/
 
@@ -33,11 +37,10 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	imgPosCell* curr;
 	/*Creating a copy of our image with zeroes for tracking*/
 	PIXEL** flag = createEmptyImg(img->rows, img->cols); 
-
-	*segments = (imgPosCell**)malloc(sizeof(imgPosCell*) * physize);
+	/*Allocating memory for segments array*/
+	*segments = (imgPosCell*)malloc(sizeof(imgPosCell) * physize);
 	checkMemory(*segments);
 	
-
 	/*The loop is running until all the segments are covered by the flag*/
 	while (!isAllCovered(flag, img->cols, img->rows))
 	{
@@ -47,24 +50,18 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		curr = sortNeighbors(minSegment, &flag); 
 
 		/*Adding the segment to the array*/
-		if (size == physize)
-		{
-			physize *= 2;
-			*segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*)*physize);
-			checkMemory(*segments);
-		}
-		*segments[size] = curr;
-		size++;
+		addItemToArray(&size, &physize, &segments, curr);
 	}
 
 	/*Reallocate to the right size*/
 	if (size < physize)
 	{
-		*segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*) * size);
+		*segments = (imgPosCell*)realloc(segments, sizeof(imgPosCell) * size);
 		checkMemory(*segments);
 	}
 
 	sortSegments(img, threshold, segments, size);
+	freeflag(flag, img->rows);
 	return size;
 }
 
@@ -90,9 +87,10 @@ static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL*** 
 
 	*node->position = position;
 	node->next = *nodes;
-	*nodes = node;
 	node->prev = NULL;
-
+	(*nodes)->prev = node;
+	*nodes = node;
+	
 	*flag[node->position[0]][node->position[1]] = 1;
 }
 
@@ -165,4 +163,40 @@ static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments
 			}
 		}
 	}
+}
+
+static void addItemToArray(ushort* size, ushort* physize,imgPosCell**** segments,imgPosCell* curr)
+{
+	if (*size == *physize)
+	{
+		*physize *= 2;
+		**segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*) * (*physize));
+		checkMemory(**segments);
+	}
+	**segments[*size] = curr;
+	(*size)++;
+}
+
+static void freeflag(PIXEL** flag, ushort rows)
+{
+	ushort i;
+	for (i = 0; i < rows; i++)
+		free(flag[i]);
+	free(flag);
+}
+
+static void freeSegmentsArr(imgPosCell** segments, ushort size)
+{
+	ushort i;
+	for (i = 0; i < size; i++)
+		while (segments[i])
+			deleteFromBeginning(segments[i]);
+	free(segments);
+}
+
+static void deleteFromBeginning(imgPosCell* node)
+{
+	node = node->next;
+	free(node->prev);
+	node->prev = NULL;
 }
