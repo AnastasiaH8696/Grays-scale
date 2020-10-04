@@ -74,3 +74,20 @@ void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag)
 
 	*flag[*kernel[0]][*kernel[1]] = 1;
 }
+
+grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
+{
+	imgPosCell* curr;
+	uint i, color;
+
+	for (i = 0; i < size; i++)
+	{
+		curr = segments[i];
+		color = i * (255 / size - 1);
+		while (curr)
+		{
+			img->pixels[curr->position[0]][curr->position[1]] = color + '0';
+			curr = curr->next;
+		}
+	}
+}

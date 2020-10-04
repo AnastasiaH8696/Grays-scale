@@ -12,5 +12,6 @@
 PIXEL** createEmptyImg(ushort rows, ushort cols);
 BOOL isAllCovered(PIXEL** img, ushort cols, ushort rows);
 void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag);
+grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size);
 
 #endif
