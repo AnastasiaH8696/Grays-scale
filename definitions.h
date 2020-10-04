@@ -4,6 +4,9 @@
 /***** INCLUDES *****/
 
 /***** DEFINES *****/
+/* imgPos defines */
+#define ROWS 0
+#define COLS 1
 
 #define FALSE 0
 #define TRUE 1
