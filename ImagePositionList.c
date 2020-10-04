@@ -34,31 +34,35 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	/*Creating a copy of our image with zeroes for tracking*/
 	PIXEL** flag = createEmptyImg(img->rows, img->cols); 
 
-	segments = (imgPosCell***)malloc(sizeof(imgPosCell**) * physize);
-	checkMemory(segments);
+	*segments = (imgPosCell**)malloc(sizeof(imgPosCell*) * physize);
+	checkMemory(*segments);
 	
 
 	/*The loop is running until all the segments are covered by the flag*/
 	while (!isAllCovered(flag, img->cols, img->rows))
 	{
 		/*Finding segment and adding it to the imgPosList sorted by location*/
-		findMinKernel(kernel, img, flag);
+		findMinKernel(&kernel, img, &flag);
 		minSegment = findSingleSegment(img, kernel, threshold);
-		curr = sortNeighbors(minSegment, flag); 
+		curr = sortNeighbors(minSegment, &flag); 
 
 		/*Adding the segment to the array*/
 		if (size == physize)
 		{
 			physize *= 2;
-			segments = (imgPosCell***)realloc(segments, sizeof(imgPosCell**)*physize);
-			checkMemory(segments);
+			*segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*)*physize);
+			checkMemory(*segments);
 		}
 		*segments[size] = curr;
 		size++;
 	}
 
-	segments = (imgPosCell***)realloc(segments, sizeof(imgPosCell**) * size);
-	checkMemory(segments);
+	/*Reallocate to the right size*/
+	if (size < physize)
+	{
+		*segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*) * size);
+		checkMemory(*segments);
+	}
 
 	sortSegments(img, threshold, segments, size);
 	return size;
@@ -66,12 +70,12 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 
 static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag)
 {
-	imgPosCell* nodes;
+	imgPosCell* nodes = NULL;
 	ushort i, size = segment->size;
 
-	addToBeginningOfList(&nodes, segment->root->position);
-	for (i = 1; i < size; i++)
-		addToBeginningOfList(&nodes, segment->root->similar_neighbors[i-1]->position);
+	addToBeginningOfList(&nodes, segment->root->position, flag);
+	for (i = 0; i < size; i++)
+		addToBeginningOfList(&nodes, segment->root->similar_neighbors[i]->position, flag);
 	
 	bubbleSort(nodes);
 
@@ -80,16 +84,16 @@ static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag)
 
 static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL*** flag)
 {
-	imgPosCell* node = (imgPosCell*)malloc(sizeof(imgPosCell));
+	imgPosCell* node;
+	node = (imgPosCell*)malloc(sizeof(imgPosCell));
 	checkMemory(node);
 
-	node->position[0] = position[0];
-	node->position[1] = position[1];
+	*node->position = position;
 	node->next = *nodes;
 	*nodes = node;
 	node->prev = NULL;
 
-	flag[node->position[0]][node->position[1]] = 1;
+	*flag[node->position[0]][node->position[1]] = 1;
 }
 
 static void bubbleSort(imgPosCell *nodes)

@@ -17,9 +17,16 @@
 
 PIXEL** createEmptyImg(ushort rows, ushort cols)
 {
+	ushort i;
 	PIXEL** emptyImg;
-	emptyImg = (PIXEL**)calloc(rows, sizeof(PIXEL*));
+	emptyImg = (PIXEL**)malloc(sizeof(PIXEL*) * rows);
 	checkMemory(emptyImg);
+
+	for (i = 0; i < rows; i++)
+	{
+		emptyImg[i] = (PIXEL*)calloc(cols, sizeof(PIXEL));
+		checkMemory(emptyImg[i]);
+	}
 
 	return emptyImg;
 }
@@ -54,7 +61,7 @@ void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag)
 	{
 		while (j < img->cols)
 		{
-			if ((img->pixels[i][j] < min) && flag[i][j] != 1)
+			if ((img->pixels[i][j] < min) && *flag[i][j] != 1)
 			{
 				min = img->pixels[i][j];
 				*kernel[0] = i;
@@ -65,5 +72,5 @@ void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag)
 		j = 0;
 	}
 
-	flag[*kernel[0]][*kernel[1]] = 1;
+	*flag[*kernel[0]][*kernel[1]] = 1;
 }
