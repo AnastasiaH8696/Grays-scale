@@ -18,9 +18,12 @@
 static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag);
 static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size);
 static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL ***flag);
-static void bubbleSort(imgPosCell* nodes);
+static imgPosCell* mergeSort(imgPosCell* head);
+static imgPosCell* split(imgPosCell* head);
+static imgPosCell* merge(imgPosCell* first, imgPosCell* second);
+//static void bubbleSort(imgPosCell* nodes);
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
-static void swap(imgPosCell* maxNode, imgPosCell* minNode);
+//static void swap(imgPosCell* maxNode, imgPosCell* minNode);
 static void addItemToArray(ushort* size, ushort* physize, imgPosCell**** segments, imgPosCell* curr);
 static void freeflag(PIXEL** flag, ushort rows);
 static void freeSegmentsArr(imgPosCell** segments, ushort size);
@@ -74,7 +77,7 @@ static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag)
 	for (i = 0; i < size; i++)
 		addToBeginningOfList(&nodes, segment->root->similar_neighbors[i]->position, flag);
 	
-	bubbleSort(nodes);
+	nodes = mergeSort(nodes);
 
 	return nodes;
 }
@@ -94,7 +97,64 @@ static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL*** 
 	*flag[node->position[0]][node->position[1]] = 1;
 }
 
-static void bubbleSort(imgPosCell *nodes)
+/* Function to do merge sort */
+static imgPosCell* mergeSort(imgPosCell* head)
+{
+	if (!head || !head->next)
+		return head;
+	imgPosCell* second = split(head);
+
+	/*Recur for left and right halves*/ 
+	head = mergeSort(head);
+	second = mergeSort(second);
+
+	/*Merge the two sorted halves */
+	return merge(head, second);
+}
+
+/* Split a doubly linked list (DLL) into 2 DLLs of half sizes */
+static imgPosCell* split(imgPosCell* head)
+{
+	imgPosCell* fast = head, * slow = head;
+	while (fast->next && fast->next->next)
+	{
+		fast = fast->next->next;
+		slow = slow->next;
+	}
+	imgPosCell* temp = slow->next;
+	slow->next = NULL;
+	return temp;
+}
+
+/* Function to merge two linked lists */
+static imgPosCell* merge(imgPosCell* first, imgPosCell* second)
+{
+	/* If first linked list is empty */
+	if (!first)
+		return second;
+
+	/* If second linked list is empty */
+	if (!second)
+		return first;
+
+	/* Pick the smaller value */
+	if (!isBigger(first->position, second->position))
+	{
+		first->next = merge(first->next, second);
+		first->next->prev = first;
+		first->prev = NULL;
+		return first;
+	}
+	else
+	{
+		second->next = merge(first, second->next);
+		second->next->prev = second;
+		second->prev = NULL;
+		return second;
+	}
+}
+
+/*static void bubbleSort(imgPosCell *nodes)
 {
 	BOOL isSorted = FALSE;
 	imgPosCell* curr = nodes;
@@ -113,7 +173,7 @@ static void bubbleSort(imgPosCell *nodes)
 			curr = curr->next;
 		}
 	}
-}
+}*/
 
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode)
 {
@@ -128,7 +188,7 @@ static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode)
 	return flag;
 }
 
-static void swap(imgPosCell* maxNode, imgPosCell* minNode)
+/*static void swap(imgPosCell* maxNode, imgPosCell* minNode)
 {
 	imgPos tmp;
 	tmp[0] = maxNode->position[0];
@@ -139,7 +199,7 @@ static void swap(imgPosCell* maxNode, imgPosCell* minNode)
 
 	minNode->position[0] = tmp[0];
 	minNode->position[1] = tmp[1];
-}
+}*/
 
 static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size)
 {
@@ -147,9 +207,11 @@ static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments
 	Segment* curr;
 	Segment *next;
 	imgPosCell* temp;
+	BOOL swapped;
 
 	for (i = 0; i < size - 1; i++)
 	{
+		swapped = FALSE;
 		for (j = 0; j < size - i - 1; j++)
 		{
 			curr = findSingleSegment(img, (*segments)[j]->position, threshold);
@@ -160,8 +222,11 @@ static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments
 				temp = (*segments)[j];
 				(*segments)[j] = (*segments)[j + 1];
 				(*segments)[j + 1] = temp;
+				swapped = TRUE;
 			}
 		}
+		if (swapped == FALSE)
+			break;
 	}
 }
 
