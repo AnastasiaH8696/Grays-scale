@@ -20,6 +20,10 @@ typedef unsigned char uchar;
 
 typedef short BOOL;
 
+/**** Byte typedef *****/
+
+typedef unsigned char BYTE;
+
 /**** Pixel typedef *****/
 
 typedef unsigned char PIXEL;

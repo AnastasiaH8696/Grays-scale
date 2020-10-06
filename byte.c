@@ -1,0 +1,31 @@
+/***** INCLUDES *****/
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "definitions.h"
+#include "byte.h"
+
+/***** DEFINES *****/
+
+/***** TYPEDEFS *****/
+
+/******************* Static Function Prototypes *******************/
+
+/******************* Function Implementation *******************/
+BOOL isBitSet(uchar ch, int i)
+{
+	uchar mask = 1 << i;
+	
+	if ((ch & mask) == 0)
+		return FALSE;
+	else
+		return TRUE;
+}
+
+uchar setBit(uchar ch, int i)
+{
+	uchar mask = 1 << i;
+	return ch | mask;
+}

@@ -9,9 +9,9 @@
 
 /******************* Function Prototypes *******************/
 
-PIXEL** createEmptyImg(ushort rows, ushort cols);
-BOOL isAllCovered(PIXEL** img, ushort cols, ushort rows);
-void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag);
+BYTE** createEmptyImg(ushort rows, ushort cols);
+BOOL isAllCovered(BYTE** img, ushort cols, ushort rows);
+void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag);
 grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size);
 
 #endif
