@@ -4,6 +4,7 @@
 
 #include "byte.h"
 #include "definitions.h"
+#include "files.h"
 #include "GrayImage.h"
 #include "ImagePositionList.h"
 #include "Segment.h"
