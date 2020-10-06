@@ -8,6 +8,7 @@
 #include "ImagePositionList.h"
 #include "Segment.h"
 #include "definitions.h"
+#include "byte.h"
 
 /***** DEFINES *****/
 
@@ -15,9 +16,9 @@
 
 /******************* Static Function Prototypes *******************/
 
-static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag);
+static imgPosCell* sortNeighbors(Segment* segment, BYTE*** flag);
 static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size);
-static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL ***flag);
+static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, BYTE ***flag);
 static imgPosCell* mergeSort(imgPosCell* head);
 static imgPosCell* split(imgPosCell* head);
 static imgPosCell* merge(imgPosCell* first, imgPosCell* second);
@@ -25,7 +26,7 @@ static imgPosCell* merge(imgPosCell* first, imgPosCell* second);
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
 //static void swap(imgPosCell* maxNode, imgPosCell* minNode);
 static void addItemToArray(ushort* size, ushort* physize, imgPosCell**** segments, imgPosCell* curr);
-static void freeflag(PIXEL** flag, ushort rows);
+static void freeflag(BYTE** flag, ushort rows);
 static void freeSegmentsArr(imgPosCell** segments, ushort size);
 static void deleteFromBeginning(imgPosCell* node);
 
@@ -39,13 +40,13 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	imgPos kernel;
 	imgPosCell* curr;
 	/*Creating a copy of our image with zeroes for tracking*/
-	PIXEL** flag = createEmptyImg(img->rows, img->cols); 
+	BYTE** flag = createEmptyImg(img->rows, (img->cols)/8); 
 	/*Allocating memory for segments array*/
 	*segments = (imgPosCell*)malloc(sizeof(imgPosCell) * physize);
 	checkMemory(*segments);
 	
 	/*The loop is running until all the segments are covered by the flag*/
-	while (!isAllCovered(flag, img->cols, img->rows))
+	while (!isAllCovered(flag, img->cols, (img->rows)/8))
 	{
 		/*Finding segment and adding it to the imgPosList sorted by location*/
 		findMinKernel(&kernel, img, &flag);
@@ -68,7 +69,7 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	return size;
 }
 
-static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag)
+static imgPosCell* sortNeighbors(Segment* segment, BYTE*** flag)
 {
 	imgPosCell* nodes = NULL;
 	ushort i, size = segment->size;
@@ -82,7 +83,7 @@ static imgPosCell* sortNeighbors(Segment* segment, PIXEL*** flag)
 	return nodes;
 }
 
-static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL*** flag)
+static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, BYTE*** flag)
 {
 	imgPosCell* node;
 	node = (imgPosCell*)malloc(sizeof(imgPosCell));
@@ -94,7 +95,8 @@ static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, PIXEL*** 
 	(*nodes)->prev = node;
 	*nodes = node;
 	
-	*flag[node->position[0]][node->position[1]] = 1;
+	*flag[node->position[0]][node->position[1] / 8] = setBit(*flag[node->position[0]][node->position[1] / 8],
+		node->position[1] / 8);
 }
 
 /* Function to do merge sort */
@@ -242,7 +244,7 @@ static void addItemToArray(ushort* size, ushort* physize,imgPosCell**** segments
 	(*size)++;
 }
 
-static void freeflag(PIXEL** flag, ushort rows)
+static void freeflag(BYTE** flag, ushort rows)
 {
 	ushort i;
 	for (i = 0; i < rows; i++)

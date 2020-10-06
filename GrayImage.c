@@ -6,6 +6,7 @@
 
 #include "GrayImage.h"
 #include "definitions.h"
+#include "byte.h"
 
 /***** DEFINES *****/
 
@@ -15,32 +16,32 @@
 
 /******************* Function Implementation *******************/
 
-PIXEL** createEmptyImg(ushort rows, ushort cols)
+BYTE** createEmptyImg(ushort rows, ushort cols)
 {
 	ushort i;
-	PIXEL** emptyImg;
-	emptyImg = (PIXEL**)malloc(sizeof(PIXEL*) * rows);
+	BYTE** emptyImg;
+	emptyImg = (BYTE**)malloc(sizeof(BYTE*) * rows);
 	checkMemory(emptyImg);
 
 	for (i = 0; i < rows; i++)
 	{
-		emptyImg[i] = (PIXEL*)calloc(cols, sizeof(PIXEL));
+		emptyImg[i] = (BYTE*)calloc(cols, sizeof(BYTE));
 		checkMemory(emptyImg[i]);
 	}
 
 	return emptyImg;
 }
 
-BOOL isAllCovered(PIXEL** img, ushort cols, ushort rows)
+BOOL isAllCovered(BYTE** img, ushort cols, ushort rows)
 {
 	BOOL flag = TRUE;
 	ushort i = 0, j = 0;
 
-	while (flag && i < cols)
+	while (flag && i < rows)
 	{
-		while (j < rows)
+		while (j < cols)
 		{
-			if (img[i][j] == 0)
+			if (!isBitSet(img[i][j], j));
 				flag = FALSE;
 			j++;
 		}
@@ -52,7 +53,7 @@ BOOL isAllCovered(PIXEL** img, ushort cols, ushort rows)
 	return flag;
 }
 
-void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag)
+void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 {
 	PIXEL min = img->pixels[0][0];
 	ushort i = 0, j = 0;
@@ -61,7 +62,7 @@ void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag)
 	{
 		while (j < img->cols)
 		{
-			if ((img->pixels[i][j] < min) && *flag[i][j] != 1)
+			if ((img->pixels[i][j] < min) && !isBitSet(*flag[i][j / 8], j / 8))
 			{
 				min = img->pixels[i][j];
 				*kernel[0] = i;
@@ -72,7 +73,8 @@ void findMinKernel(imgPos* kernel, grayImage* img, PIXEL*** flag)
 		j = 0;
 	}
 
-	*flag[*kernel[0]][*kernel[1]] = 1;
+	*flag[*kernel[0]][(*kernel[1]) / 8] = setBit(*flag[*kernel[0]][(*kernel[1]) / 8],
+		(*kernel[1]) / 8);
 }
 
 grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
