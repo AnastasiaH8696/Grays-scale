@@ -7,6 +7,8 @@
 
 #define FALSE 0
 #define TRUE 1
+#define BYTE_SIZE 8
+#define MAX_PIXEL 255
 
 /***** TYPEDEFS *****/
 

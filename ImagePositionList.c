@@ -40,13 +40,13 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	imgPos kernel;
 	imgPosCell* curr;
 	/*Creating a copy of our image with zeroes for tracking*/
-	BYTE** flag = createEmptyImg(img->rows, (img->cols)/8); 
+	BYTE** flag = createEmptyImg(img->rows, (img->cols)/ BYTE_SIZE); 
 	/*Allocating memory for segments array*/
 	*segments = (imgPosCell*)malloc(sizeof(imgPosCell) * physize);
 	checkMemory(*segments);
 	
 	/*The loop is running until all the segments are covered by the flag*/
-	while (!isAllCovered(flag, img->cols, (img->rows)/8))
+	while (!isAllCovered(flag, img->cols, (img->rows)/ BYTE_SIZE))
 	{
 		/*Finding segment and adding it to the imgPosList sorted by location*/
 		findMinKernel(&kernel, img, &flag);
@@ -95,8 +95,8 @@ static void addToBeginningOfList(imgPosCell** nodes, imgPos* position, BYTE*** f
 	(*nodes)->prev = node;
 	*nodes = node;
 	
-	*flag[node->position[0]][node->position[1] / 8] = setBit(*flag[node->position[0]][node->position[1] / 8],
-		node->position[1] / 8);
+	*flag[node->position[0]][node->position[1] / BYTE_SIZE] = setBit(*flag[node->position[0]][node->position[1] / BYTE_SIZE],
+		node->position[1] / BYTE_SIZE);
 }
 
 /* Function to do merge sort */
