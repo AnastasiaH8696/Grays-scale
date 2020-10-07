@@ -139,7 +139,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="byte.c" />
     <ClCompile Include="definitions.c" />
+    <ClCompile Include="files.c" />
     <ClCompile Include="GrayImage.c" />
     <ClCompile Include="ImagePositionList.c" />
     <ClCompile Include="main.c" />
@@ -147,7 +149,9 @@
     <ClCompile Include="tests.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="byte.h" />
     <ClInclude Include="definitions.h" />
+    <ClInclude Include="files.h" />
     <ClInclude Include="GrayImage.h" />
     <ClInclude Include="ImagePositionList.h" />
     <ClInclude Include="Segment.h" />
