@@ -50,6 +50,11 @@ typedef struct _imgPosCell
 	struct _imgPosCell* prev, * next;
 } imgPosCell;
 
+typedef struct _imgPosCellList
+{
+	imgPosCell* head;
+}imgPosCellList;
+
 /***** Segment data structure *****/
 
 typedef struct _treeNode
