@@ -52,7 +52,7 @@ typedef struct _imgPosCell
 
 typedef struct _imgPosCellList
 {
-	imgPosCell* head;
+	imgPosCell* head, *tail;
 }imgPosCellList;
 
 /***** Segment data structure *****/

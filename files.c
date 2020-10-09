@@ -1,3 +1,7 @@
+/***** DEFINES *****/
+
+#define _CRT_SECURE_NO_WARNINGS
+
 /***** INCLUDES *****/
 
 #include <stdio.h>
@@ -6,8 +10,6 @@
 
 #include "definitions.h"
 #include "files.h"
-
-/***** DEFINES *****/
 
 /***** TYPEDEFS *****/
 
@@ -74,14 +76,14 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 			currPixel = (img->pixels[i][j]) / div;
 			if (freeSpace < bitSize) /* The number between two bytes */
 			{
-				compressed[byteIndex] |= currPixel >> (bitSize - freeSpace);
+				compressed[byteIndex] |= (currPixel) >> (bitSize - freeSpace);
 				byteIndex++;
-				compressed[byteIndex] |= currPixel << (BYTE_SIZE-bitSize) + (bitSize - freeSpace);
+				compressed[byteIndex] |= ((currPixel) << (BYTE_SIZE-bitSize)) + (bitSize - freeSpace);
 				freeSpace = (BYTE_SIZE - bitSize) + (bitSize - freeSpace);
 			}
 			else
 			{
-				compressed[byteIndex] |= currPixel << freeSpace - bitSize;
+				compressed[byteIndex] |= (currPixel) << (freeSpace - bitSize);
 				freeSpace = freeSpace - bitSize;
 			}
 			
