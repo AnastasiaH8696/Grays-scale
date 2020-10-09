@@ -16,15 +16,28 @@
 
 /******************* Static Function Prototypes *******************/
 
+/*Sorting functions*/
 static imgPosCell* sortNeighbors(Segment* segment, BYTE*** flag);
 static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size);
+
+/*List basic functions*/
+static imgPosCellList makeEmptyList();
+static void addToBeginningOfList(imgPosCellList* nodes, imgPosCell* node);
+static void addToEndOfList(imgPosCellList* nodes, imgPosCell* node);
+static void addToInnerPlaceInList(imgPosCell* prev, imgPosCell* node);
 static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag);
 static void addToList(imgPosCellList* nodes, imgPos position, BYTE ***flag);
-static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
+static void deleteFromBeginning(imgPosCell* node);
+
+/*Array functions*/
 static void addItemToArray(ushort* size, ushort* physize, imgPosCell**** segments, imgPosCell* curr);
+
+/*Free functions*/
 static void freeflag(BYTE** flag, ushort rows);
 static void freeSegmentsArr(imgPosCell** segments, ushort size);
-static void deleteFromBeginning(imgPosCell* node);
+
+/*Other functions*/
+static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
 
 /******************* Function Implementation *******************/
 
@@ -67,14 +80,21 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 
 static imgPosCell* sortNeighbors(Segment* segment, BYTE*** flag)
 {
-	imgPosCellList* lst;
+	imgPosCellList lst = makeEmptyList();
 	addToEmptyList(&lst, segment->root->position, flag);
 
 	ushort i, size = segment->size;
 	for (i = 0; i < size; i++)
 		addToList(&lst, segment->root->similar_neighbors[i]->position, flag);
 	
-	return lst->head;
+	return lst.head;
+}
+
+static imgPosCellList makeEmptyList()
+{
+	imgPosCellList lst;
+	lst.head = lst.tail = NULL;
+	return lst;
 }
 
 static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
@@ -104,13 +124,38 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 
 	prev = curr->prev;
 
+	if (!prev)
+		addToBeginningOfList(nodes, node);
+
+	else if (!curr)
+		addToEndOfList(nodes, node);
+	else
+		addToInnerPlaceInList(prev, node);
+
+	*flag[node->position[0]][node->position[1] / BYTE_SIZE] = setBit(*flag[node->position[0]][node->position[1] / BYTE_SIZE],
+		node->position[1] / BYTE_SIZE);
+}
+
+static void addToBeginningOfList(imgPosCellList* nodes, imgPosCell* node)
+{
+	node->next = nodes->head;
+	nodes->head->prev = node;
+	nodes->head = node;
+}
+
+static void addToEndOfList(imgPosCellList* nodes, imgPosCell* node)
+{
+	node->prev = nodes->tail;
+	nodes->tail->next = node;
+	nodes->tail = node;
+}
+
+static void addToInnerPlaceInList(imgPosCell* prev, imgPosCell* node)
+{
 	node->next = prev->next;
 	prev->next = node;
 	node->prev = prev;
 	node->next->prev = node;
-	
-	*flag[node->position[0]][node->position[1] / BYTE_SIZE] = setBit(*flag[node->position[0]][node->position[1] / BYTE_SIZE],
-		node->position[1] / BYTE_SIZE);
 }
 
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode)

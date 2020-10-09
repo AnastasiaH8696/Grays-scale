@@ -82,14 +82,21 @@ grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 	imgPosCell* curr;
 	uint i, color;
 
+	grayImage newImg;
+	newImg.cols = img->cols;
+	newImg.rows = img->rows;
+	newImg.pixels = createEmptyImg(newImg.rows, newImg.cols);
+
 	for (i = 0; i < size; i++)
 	{
 		curr = segments[i];
 		color = i * (255 / size - 1);
 		while (curr)
 		{
-			img->pixels[curr->position[0]][curr->position[1]] = color + '0';
+			newImg.pixels[curr->position[0]][curr->position[1]] = color + '0';
 			curr = curr->next;
 		}
 	}
+
+	return &newImg;
 }
