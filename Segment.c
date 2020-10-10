@@ -26,7 +26,6 @@ Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
 	treeNode root = createNewTreeNode(kernel);
 	res_segment.root = &root;
 	res_segment.size = 1;
-
 	addSimilarNeighbors(img, kernel, threshold, res_segment);
 	return &res_segment;
 }
