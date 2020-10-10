@@ -9,6 +9,8 @@
 /***** TYPEDEFS *****/
 
 /******************* Function Prototypes *******************/
+grayImage* readPGM(char* fname);
+void skipComments(FILE* fp);
 void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels);
 void checkFileMemory(void* ptr);
 

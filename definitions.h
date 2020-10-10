@@ -4,6 +4,10 @@
 /***** INCLUDES *****/
 
 /***** DEFINES *****/
+/* Errors defines */
+#define OPEN_FILE_ERROR -2
+#define FILE_VERSION_ERROR -3
+
 /* imgPos defines */
 #define ROWS 0
 #define COLS 1
