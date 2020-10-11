@@ -102,12 +102,12 @@ static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	imgPosCell* node;
 	node = (imgPosCell*)malloc(sizeof(imgPosCell));
 	checkMemory(node);
-	node->position[0] = position[0];
-	node->position[1] = position[1];
+	node->position[ROWS] = position[ROWS];
+	node->position[COLS] = position[COLS];
 	node->next = node->prev = NULL;
 
-	*flag[node->position[0]][node->position[1] / BYTE_SIZE] = setBit(*flag[node->position[0]][node->position[1] / BYTE_SIZE],
-		node->position[1] / BYTE_SIZE);
+	*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE] = setBit(*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE],
+		node->position[COLS] / BYTE_SIZE);
 }
 
 static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
@@ -115,8 +115,8 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	imgPosCell* node;
 	node = (imgPosCell*)malloc(sizeof(imgPosCell));
 	checkMemory(node);
-	node->position[0] = position[0];
-	node->position[1] = position[1];
+	node->position[ROWS] = position[ROWS];
+	node->position[COLS] = position[COLS];
 
 	imgPosCell* curr = nodes->head, * prev;
 	while (curr && isBigger(node, curr))
@@ -132,8 +132,8 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	else
 		addToInnerPlaceInList(prev, node);
 
-	*flag[node->position[0]][node->position[1] / BYTE_SIZE] = setBit(*flag[node->position[0]][node->position[1] / BYTE_SIZE],
-		node->position[1] / BYTE_SIZE);
+	*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE] = setBit(*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE],
+		node->position[COLS] / BYTE_SIZE);
 }
 
 static void addToBeginningOfList(imgPosCellList* nodes, imgPosCell* node)
@@ -162,10 +162,10 @@ static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode)
 {
 	BOOL flag = FALSE;
 
-	if (maxNode->position[0] > minNode->position[0])
+	if (maxNode->position[ROWS] > minNode->position[ROWS])
 		flag = TRUE;
-	else if ((maxNode->position[0] == minNode->position[0])
-		&& maxNode->position[1] > minNode->position[1])
+	else if ((maxNode->position[ROWS] == minNode->position[ROWS])
+		&& maxNode->position[COLS] > minNode->position[COLS])
 		flag = TRUE;
 
 	return flag;

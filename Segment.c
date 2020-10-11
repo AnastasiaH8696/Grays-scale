@@ -28,7 +28,7 @@ Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
 	res_segment.root = &root;
 	res_segment.size = 1;
 
-	flag[kernel[0]][(kernel[1]) / 8] = setBit(flag[kernel[0]][(kernel[1]) / 8], (kernel[1]) / 8);
+	flag[kernel[ROWS]][(kernel[COLS]) / 8] = setBit(flag[kernel[ROWS]][(kernel[COLS]) / 8], (kernel[COLS]) / 8);
 	addSimilarNeighbors(img, kernel, threshold, res_segment, flag);
 	return &res_segment;
 }
