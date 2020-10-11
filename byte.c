@@ -17,11 +17,7 @@
 BOOL isBitSet(uchar ch, int i)
 {
 	uchar mask = 1 << i;
-	
-	if ((ch & mask) == 0)
-		return FALSE;
-	else
-		return TRUE;
+	return ch & mask;
 }
 
 uchar setBit(uchar ch, int i)

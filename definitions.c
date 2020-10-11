@@ -13,7 +13,7 @@ void checkMemory(void* ptr)
 {
 	if (ptr == NULL)
 	{
-		puts("ERROR");
-		exit(1);
+		fprintf(stderr, "Allocation Failure");
+		exit(ALLOCATION_ERROR);
 	}
 }
