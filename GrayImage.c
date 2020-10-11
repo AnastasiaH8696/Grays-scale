@@ -65,16 +65,16 @@ void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 			if ((img->pixels[i][j] < min) && !isBitSet(*flag[i][j / 8], j / 8))
 			{
 				min = img->pixels[i][j];
-				*kernel[0] = i;
-				*kernel[1] = j;
+				*kernel[ROWS] = i;
+				*kernel[COLS] = j;
 			}
 		}
 		i++;
 		j = 0;
 	}
 
-	*flag[*kernel[0]][(*kernel[1]) / 8] = setBit(*flag[*kernel[0]][(*kernel[1]) / 8],
-		(*kernel[1]) / 8);
+	*flag[*kernel[ROWS]][(*kernel[COLS]) / 8] = setBit(*flag[*kernel[ROWS]][(*kernel[COLS]) / 8],
+		(*kernel[COLS]) / 8);
 }
 
 grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
@@ -93,7 +93,7 @@ grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 		color = i * (255 / size - 1);
 		while (curr)
 		{
-			newImg.pixels[curr->position[0]][curr->position[1]] = color + '0';
+			newImg.pixels[curr->position[ROWS]][curr->position[COLS]] = color + '0';
 			curr = curr->next;
 		}
 	}
