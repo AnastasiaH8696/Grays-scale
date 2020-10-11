@@ -97,8 +97,8 @@ void checkFileMemory(void* ptr)
 {
 	if (ptr == NULL)
 	{
-		puts("ERROR");
-		exit(1);
+		fprintf(stderr, "File memory failure");
+		exit(FILE_MEMORY_ERROR);
 		fclose(ptr);
 	}
 }
