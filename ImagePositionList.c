@@ -51,7 +51,7 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	/*Creating a copy of our image with zeroes for tracking*/
 	BYTE** flag = createEmptyImg(img->rows, (img->cols)/ BYTE_SIZE); 
 	/*Allocating memory for segments array*/
-	*segments = (imgPosCell*)realloc(segments, sizeof(imgPosCell) * physize);
+	*segments = (imgPosCell*)malloc(sizeof(imgPosCell) * physize);
 	checkMemory(*segments);
 	
 	/*The loop is running until all the segments are covered by the flag*/

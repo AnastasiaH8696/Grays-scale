@@ -8,6 +8,5 @@
 /***** TYPEDEFS *****/
 
 /******************* Function Prototypes *******************/
-
-
+void e2eTest();
 #endif
