@@ -157,6 +157,14 @@
     <ClInclude Include="Segment.h" />
     <ClInclude Include="tests.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Downloads\cat.pgm" />
+    <None Include="..\..\..\Downloads\dog.pgm" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Downloads\cat.jpg" />
+    <Image Include="..\..\..\Downloads\dog.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
