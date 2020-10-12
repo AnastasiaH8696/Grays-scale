@@ -29,7 +29,7 @@ Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
 	res_segment.size = 1;
 
 	flag[kernel[ROWS]][(kernel[COLS]) / 8] = setBit(flag[kernel[ROWS]][(kernel[COLS]) / 8], (kernel[COLS]) / 8);
-	addSimilarNeighbors(img, kernel, threshold, res_segment, flag);
+	addSimiliarNeighbors(img, kernel, threshold, res_segment, flag);
 	return &res_segment;
 }
 
@@ -49,7 +49,7 @@ void addSimiliarNeighborsRec(grayImage* img, imgPos pos, uchar minVal, uchar max
 		findChildren(img, pos, minVal, maxVal, nodes[i], flag);
 	}
 	for (i = 0; nodes[i]; i++) {
-		addSimiliarNeighborsRec(img, pos, minVal, maxVal, nodes[i]->similar_neighbors);
+		addSimiliarNeighborsRec(img, pos, minVal, maxVal, nodes[i]->similar_neighbors, flag);
 	}
 }
 

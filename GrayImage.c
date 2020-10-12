@@ -82,10 +82,10 @@ grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 	imgPosCell* curr;
 	uint i, color;
 
-	grayImage newImg;
-	newImg.cols = img->cols;
-	newImg.rows = img->rows;
-	newImg.pixels = createEmptyImg(newImg.rows, newImg.cols);
+	grayImage* newImg = (grayImage*)malloc(sizeof(grayImage));
+	newImg->cols = img->cols;
+	newImg->rows = img->rows;
+	newImg->pixels = createEmptyImg(newImg->rows, newImg->cols);
 
 	for (i = 0; i < size; i++)
 	{
@@ -93,10 +93,10 @@ grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 		color = i * (255 / size - 1);
 		while (curr)
 		{
-			newImg.pixels[curr->position[ROWS]][curr->position[COLS]] = color + '0';
+			newImg->pixels[curr->position[ROWS]][curr->position[COLS]] = color + '0';
 			curr = curr->next;
 		}
 	}
 
-	return &newImg;
+	return newImg;
 }

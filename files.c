@@ -22,7 +22,8 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 /******************* Function Implementation *******************/
 grayImage* readPGM(char* fname)
 {
-	grayImage res_grayImage;
+	grayImage *res_grayImage = (grayImage*)malloc(sizeof(grayImage));
+	checkMemory(res_grayImage);
 	FILE* pgmFile;
 	char version[3];
 	ushort maxVal;
@@ -34,28 +35,29 @@ grayImage* readPGM(char* fname)
 		exit(OPEN_FILE_ERROR);
 	}
 	fgets(version, sizeof(version), pgmFile);
-	if (strcmp(version, "P5")) {
+	if (!strcmp(version, "P5")) {
 		fprintf(stderr, "Wrong file version!\n");
 		exit(FILE_VERSION_ERROR);
 	}
 	skipComments(pgmFile);
-	fscanf(pgmFile, "%d", res_grayImage.cols);
+	fscanf(pgmFile, "%hu", &res_grayImage->cols);
+	
 	skipComments(pgmFile);
-	fscanf(pgmFile, "%d", res_grayImage.rows);
+	fscanf(pgmFile, "%hu", &res_grayImage->rows);
 	skipComments(pgmFile);
-	fscanf(pgmFile, "%d", maxVal);
+	fscanf(pgmFile, "%hu", &maxVal);
 	fgetc(pgmFile);
 
-	res_grayImage.pixels = createEmptyImg(res_grayImage.rows, res_grayImage.cols);
-	for (row = 0; row < res_grayImage.rows; row++) {
-		for (col = 0; col < res_grayImage.cols; col++) {
+	res_grayImage->pixels = createEmptyImg(res_grayImage->rows, res_grayImage->cols);
+	for (row = 0; row < res_grayImage->rows; row++) {
+		for (col = 0; col < res_grayImage->cols; col++) {
 			fscanf(pgmFile, "%d", &val);
-			res_grayImage.pixels[row][col] = (int)(((double)val / (double)maxVal) * 255);
+			res_grayImage->pixels[row][col] = (int)(((double)val / (double)maxVal) * 255);
 		}
 	}
 
 	fclose(pgmFile);
-	return &res_grayImage;
+	return res_grayImage;
 }
 
 void skipComments(FILE* fp)
