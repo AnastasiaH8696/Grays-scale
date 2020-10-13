@@ -18,15 +18,18 @@
 
 BYTE** createEmptyImg(ushort rows, ushort cols)
 {
-	ushort i;
+	ushort i, j;
 	BYTE** emptyImg;
 	emptyImg = (BYTE**)malloc(sizeof(BYTE*) * rows);
 	checkMemory(emptyImg);
 
 	for (i = 0; i < rows; i++)
 	{
-		emptyImg[i] = (BYTE*)calloc(cols, sizeof(BYTE));
-		checkMemory(emptyImg[i]);
+		(emptyImg)[i] = (BYTE*)calloc(cols, sizeof(BYTE));
+		checkMemory((emptyImg)[i]);
+
+		for (j = 0; j < cols; j++)
+			(emptyImg)[i][0] = '\0';
 	}
 
 	return emptyImg;
@@ -62,19 +65,20 @@ void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 	{
 		while (j < img->cols)
 		{
-			if ((img->pixels[i][j] < min) && !isBitSet(*flag[i][j / 8], j / 8))
+			if ((img->pixels[i][j] < min) && !isBitSet((*flag)[i][j / 8], j / 8))
 			{
 				min = img->pixels[i][j];
-				*kernel[ROWS] = i;
-				*kernel[COLS] = j;
+				(*kernel)[ROWS] = i;
+				(*kernel)[COLS] = j;
 			}
+			j++;
 		}
 		i++;
 		j = 0;
 	}
 
-	*flag[*kernel[ROWS]][(*kernel[COLS]) / 8] = setBit(*flag[*kernel[ROWS]][(*kernel[COLS]) / 8],
-		(*kernel[COLS]) / 8);
+	(*flag)[(*kernel)[ROWS]][(*kernel)[COLS] / 8] = setBit((*flag)[(*kernel)[ROWS]][(*kernel)[COLS] / 8],
+		(*kernel)[COLS] / 8);
 }
 
 grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "definitions.h"
 #include "files.h"
@@ -40,18 +41,17 @@ grayImage* readPGM(char* fname)
 		exit(FILE_VERSION_ERROR);
 	}
 	skipComments(pgmFile);
-	fscanf(pgmFile, "%hu", &res_grayImage->cols);
-	
+	if (fscanf(pgmFile, "%hu", &res_grayImage->cols));
 	skipComments(pgmFile);
-	fscanf(pgmFile, "%hu", &res_grayImage->rows);
+	if(fscanf(pgmFile, "%hu", &res_grayImage->rows));
 	skipComments(pgmFile);
-	fscanf(pgmFile, "%hu", &maxVal);
+	if(fscanf(pgmFile, "%hu", &maxVal));
 	fgetc(pgmFile);
 
 	res_grayImage->pixels = createEmptyImg(res_grayImage->rows, res_grayImage->cols);
 	for (row = 0; row < res_grayImage->rows; row++) {
 		for (col = 0; col < res_grayImage->cols; col++) {
-			fscanf(pgmFile, "%d", &val);
+			if(fscanf(pgmFile, "%d", &val));
 			res_grayImage->pixels[row][col] = (int)(((double)val / (double)maxVal) * 255);
 		}
 	}
