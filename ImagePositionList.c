@@ -30,7 +30,7 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE ***flag);
 static void deleteFromBeginning(imgPosCell* node);
 
 /*Array functions*/
-static void addItemToArray(ushort* size, ushort* physize, imgPosCell**** segments, imgPosCell* curr);
+static void addItemToArray(uint* size, uint* physize, imgPosCell**** segments, imgPosCell* curr);
 
 /*Free functions*/
 static void freeflag(BYTE** flag, ushort rows);
@@ -51,7 +51,7 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	/*Creating a copy of our image with zeroes for tracking*/
 	BYTE** flag = createEmptyImg(img->rows, (img->cols)/ BYTE_SIZE); 
 	/*Allocating memory for segments array*/
-	*segments = (imgPosCell*)malloc(sizeof(imgPosCell) * physize);
+	*segments = (imgPosCell**)malloc(sizeof(imgPosCell*) * physize);
 	checkMemory(*segments);
 	
 	/*The loop is running until all the segments are covered by the flag*/
@@ -69,7 +69,7 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	/*Reallocate to the right size*/
 	if (size < physize)
 	{
-		*segments = (imgPosCell*)realloc(segments, sizeof(imgPosCell) * size);
+		*segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*) * size);
 		checkMemory(*segments);
 	}
 
@@ -102,12 +102,12 @@ static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	imgPosCell* node;
 	node = (imgPosCell*)malloc(sizeof(imgPosCell));
 	checkMemory(node);
-	node->position[ROWS] = position[ROWS];
-	node->position[COLS] = position[COLS];
+	(node->position)[ROWS] = position[ROWS];
+	(node->position)[COLS] = position[COLS];
 	node->next = node->prev = NULL;
 
-	*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE] = setBit(*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE],
-		node->position[COLS] / BYTE_SIZE);
+	(*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE] = setBit((*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE],
+		(node->position)[COLS] / BYTE_SIZE);
 }
 
 static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
@@ -115,10 +115,10 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	imgPosCell* node;
 	node = (imgPosCell*)malloc(sizeof(imgPosCell));
 	checkMemory(node);
-	node->position[ROWS] = position[ROWS];
-	node->position[COLS] = position[COLS];
+	(node->position)[ROWS] = position[ROWS];
+	(node->position)[COLS] = position[COLS];
 
-	imgPosCell* curr = nodes->head, * prev;
+	imgPosCell* curr = nodes->head, *prev;
 	while (curr && isBigger(node, curr))
 		curr = curr->next;
 
@@ -132,8 +132,8 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	else
 		addToInnerPlaceInList(prev, node);
 
-	*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE] = setBit(*flag[node->position[ROWS]][node->position[COLS] / BYTE_SIZE],
-		node->position[COLS] / BYTE_SIZE);
+	(*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE] = setBit((*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE],
+		(node->position)[COLS] / BYTE_SIZE);
 }
 
 static void addToBeginningOfList(imgPosCellList* nodes, imgPosCell* node)
@@ -200,7 +200,7 @@ static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments
 	}
 }
 
-static void addItemToArray(ushort* size, ushort* physize,imgPosCell**** segments,imgPosCell* curr)
+static void addItemToArray(uint* size, uint* physize,imgPosCell**** segments,imgPosCell* curr)
 {
 	if (*size == *physize)
 	{

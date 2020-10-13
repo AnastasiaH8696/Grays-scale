@@ -14,13 +14,13 @@
 given in threshold. The function returns the found segment. */
 Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold);
 
-void addSimiliarNeighbors(grayImage* img, imgPos pos, unsigned char threshold, Segment seg);
+void addSimiliarNeighbors(grayImage* img, imgPos pos, unsigned char threshold, Segment* seg, BYTE*** flag);
 
-void addSimiliarNeighborsRec(grayImage* img, imgPos pos, uchar minVal, uchar maxVal, treeNode** nodes);
+void addSimiliarNeighborsRec(grayImage* img, imgPos pos, uchar minVal, uchar maxVal, treeNode** nodes, BYTE*** flag);
 
-void findChildren(grayImage* img, imgPos pos, uchar minVal, uchar maxVal, treeNode** children);
+void findChildren(grayImage* img, imgPos pos, uchar minVal, uchar maxVal, treeNode** children, BYTE*** flag);
 
-treeNode createNewTreeNode(imgPos pos);
+treeNode* createNewTreeNode(imgPos pos);
 
 void appendChild(treeNode** children, treeNode* child);
 
