@@ -17,84 +17,112 @@
 
 /******************* Function Implementation *******************/
 
-Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
+treeNode** allocateTreeNodeList()
 {
-	Segment *res_segment = (Segment*)malloc(sizeof(Segment));  /* The returned Segment value */
-	checkMemory(res_segment);
-	/*Creating a copy of our image with zeroes for tracking*/
-	BYTE** flag = createEmptyImg(img->rows, (img->cols) / BYTE_SIZE);
-
-	treeNode *root = createNewTreeNode(kernel);
-	res_segment->root = root;
-	res_segment->size = 1;
-
-	flag[kernel[ROWS]][(kernel[COLS]) / 8] = setBit(flag[kernel[ROWS]][(kernel[COLS]) / 8], (kernel[COLS]) / 8);
-	addSimiliarNeighbors(img, kernel, threshold, res_segment, &flag);
-	return res_segment;
+	treeNode** resTreeNodeList = (treeNode**)malloc(sizeof(treeNode*));
+	checkMemory(resTreeNodeList);
+	resTreeNodeList[0] = NULL;
+	
+	return resTreeNodeList;
 }
 
-void addSimiliarNeighbors(grayImage* img, imgPos pos, unsigned char threshold, Segment* seg, BYTE*** flag)
+treeNode* initTreeNode(imgPos rootPos)
 {
-	uchar minVal = img->pixels[pos[ROWS], pos[COLS]] - threshold;
-	uchar maxVal = img->pixels[pos[ROWS], pos[COLS]] + threshold;
-	addSimiliarNeighborsRec(img, pos, minVal, maxVal, seg->root, flag);
+	treeNode* resTreeNode = (treeNode*)malloc(sizeof(treeNode));
+	checkMemory(resTreeNode);
+	resTreeNode->position[ROWS] = rootPos[ROWS];
+	resTreeNode->position[COLS] = rootPos[COLS];
+	resTreeNode->similar_neighbors = allocateTreeNodeList();
+	
+	return resTreeNode;
 }
 
-void addSimiliarNeighborsRec(grayImage* img, imgPos pos, uchar minVal, uchar maxVal, treeNode** nodes, BYTE*** flag)
+Segment* initSegment(imgPos rootPos)
 {
-	ushort i;
-	if (nodes[0] == NULL)
-		return;
-	for (i = 0; nodes[i]; i++) {
-		findChildren(img, pos, minVal, maxVal, nodes[i], flag);
-	}
-	for (i = 0; nodes[i]; i++) {
-		addSimiliarNeighborsRec(img, pos, minVal, maxVal, nodes[i]->similar_neighbors, flag);
-	}
+	Segment* resSeg = (Segment*)malloc(sizeof(Segment));
+	checkMemory(resSeg);
+	resSeg->root = initTreeNode(rootPos);
+	resSeg->size = 1;
+
+	return resSeg;
 }
 
-void findChildren(grayImage* img, imgPos pos, uchar minVal, uchar maxVal, treeNode** children, BYTE*** flag)
+void appendChild(treeNode*** tnlst, treeNode* child)
 {
-	uchar neighborVal;
-	imgPos neighborPos;
+	static int counter = 0;
+	ushort i = 0;
+	while ((*tnlst)[i++]);
+	*tnlst = (treeNode**)realloc(*tnlst, sizeof(treeNode*) * (i + 1));
+	checkMemory(tnlst);
+	(*tnlst)[i - 1] = child;
+	(*tnlst)[i] = NULL;
+	counter++;
+}
+
+void appendNeighbor(treeNode* tn, treeNode* neighbor)
+{
+	appendChild(&(tn->similar_neighbors), neighbor);
+}
+
+void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*** flag)
+{
 	short i, j;
-
-	/* Going over surroinding pixels */
+	imgPos potentialNeighborPos;
+	treeNode* potentialNeighbor;
+	uchar potentialNeighborVal;
 	for (i = -1; i <= 1; i++)
 	{
 		for (j = -1; j <= 1; j++)
 		{
-			neighborPos[ROWS] = pos[ROWS] + i;
-			neighborPos[COLS] = pos[COLS] + j;
-			neighborVal = img->pixels[neighborPos[ROWS]][neighborPos[COLS]];
-			if (!isBitSet((*flag)[neighborPos[ROWS]][neighborPos[COLS] / 8], neighborPos[COLS] / 8) && (neighborVal >= minVal && neighborVal <= maxVal))
+			potentialNeighborPos[ROWS] = tn->position[ROWS] + i;
+			potentialNeighborPos[COLS] = tn->position[COLS] + j;
+			potentialNeighborVal = img->pixels[potentialNeighborPos[ROWS]][potentialNeighborPos[COLS]];
+			if ((minVal <= potentialNeighborVal && maxVal >= potentialNeighborVal) && !isFlagSet(flag, potentialNeighborPos))
 			{
-				treeNode *neighbor = createNewTreeNode(neighborPos);
-				appendChild(children, neighbor);
-				(*flag)[neighborPos[ROWS]][(neighborPos[COLS]) / 8] = setBit((*flag)[neighborPos[ROWS]][(neighborPos[COLS]) / 8], (neighborPos[COLS]) / 8);
+				potentialNeighbor = initTreeNode(potentialNeighborPos);
+				appendNeighbor(tn, potentialNeighbor);
+				raiseFlag(flag, potentialNeighborPos);
 			}
 		}
 	}
 }
 
-treeNode *createNewTreeNode(imgPos pos)
-{
-	treeNode *newTreeNode = (treeNode*)malloc(sizeof(treeNode));
-	checkMemory(newTreeNode);
-	
-	newTreeNode->position[ROWS] = pos[ROWS];
-	newTreeNode->position[COLS] = pos[COLS];
-	newTreeNode->similar_neighbors = (treeNode**)malloc(sizeof(treeNode*));
-	checkMemory(newTreeNode->similar_neighbors);
-
-	return newTreeNode;
-}
-
-void appendChild(treeNode** children, treeNode* child)
+void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, uchar maxVal, BYTE*** flag)
 {
 	ushort i = 0;
-	while (children[i++]); /* Get to the end of the list */
-	children = (treeNode *)realloc(children, sizeof(treeNode), (i+1));
-	children[i - 1] = child;
-	children[i] = NULL;
+	while (tnlst[i])
+	{
+		addChildren(img, tnlst[i], minVal, maxVal, flag);
+		i++;
+	}
+	i = 0;
+	while (tnlst[i])
+	{
+		buildSegmentRec(img, tnlst[i]->similar_neighbors, minVal, maxVal, flag);
+		i++;
+	}
+}
+
+void buildSegment(grayImage* img, Segment* seg, uchar threshold, BYTE*** flag)
+{
+	uchar pixelVal = img->pixels[seg->root->position[ROWS]][seg->root->position[COLS]];
+	uchar minVal = threshold > pixelVal ? MIN_VAL : pixelVal - threshold;
+	uchar maxVal = threshold > MAX_VAL - pixelVal ? MAX_VAL : pixelVal + threshold;
+
+	treeNode** tnlst = allocateTreeNodeList();
+	appendChild(&tnlst, seg->root);
+	raiseFlag(flag, seg->root->position);
+
+	buildSegmentRec(img, tnlst, minVal, maxVal, flag);
+}
+
+Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
+{
+	Segment* resSeg = initSegment(kernel); /* The returned result segment */
+	/*Creating a copy of our image with zeroes for tracking*/
+	BYTE** flag = createEmptyImg(img->rows, (img->cols) / BYTE_SIZE);
+
+	buildSegment(img, resSeg, threshold, &flag);
+
+	return resSeg;
 }

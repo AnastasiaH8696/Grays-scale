@@ -18,6 +18,8 @@
 #define TRUE 1
 #define BYTE_SIZE 8
 #define MAX_PIXEL 255
+#define MIN_VAL 0
+#define MAX_VAL 255
 
 /***** TYPEDEFS *****/
 
