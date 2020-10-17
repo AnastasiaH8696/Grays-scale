@@ -63,13 +63,13 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		curr = sortNeighbors(minSegment, &flag); 
 
 		/*Adding the segment to the array*/
-		addItemToArray(&size, &physize, &segments, curr);
+		addItemToArray(&size, &physize, segments, curr);
 	}
 
 	/*Reallocate to the right size*/
 	if (size < physize)
 	{
-		*segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*) * size);
+		*segments = (imgPosCell**)realloc(*segments, sizeof(imgPosCell*) * size);
 		checkMemory(*segments);
 	}
 
@@ -105,6 +105,7 @@ static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	(node->position)[ROWS] = position[ROWS];
 	(node->position)[COLS] = position[COLS];
 	node->next = node->prev = NULL;
+	nodes->head = nodes->tail = node;
 
 	(*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE] = setBit((*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE],
 		(node->position)[COLS] / BYTE_SIZE);
@@ -118,11 +119,12 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	(node->position)[ROWS] = position[ROWS];
 	(node->position)[COLS] = position[COLS];
 
-	imgPosCell* curr = nodes->head, *prev;
+	imgPosCell* curr = nodes->head, *prev = NULL;
 	while (curr && isBigger(node, curr))
+	{
+		prev = curr;
 		curr = curr->next;
-
-	prev = curr->prev;
+	}
 
 	if (!prev)
 		addToBeginningOfList(nodes, node);
@@ -200,15 +202,15 @@ static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments
 	}
 }
 
-static void addItemToArray(uint* size, uint* physize,imgPosCell**** segments,imgPosCell* curr)
+static void addItemToArray(uint* size, uint* physize,imgPosCell*** segments,imgPosCell* curr)
 {
 	if (*size == *physize)
 	{
 		*physize *= 2;
-		**segments = (imgPosCell**)realloc(segments, sizeof(imgPosCell*) * (*physize));
+		*segments = (imgPosCell**)realloc(*segments, *physize * sizeof(imgPosCell*));
 		checkMemory(**segments);
 	}
-	**segments[*size] = curr;
+	*segments[*size] = curr;
 	(*size)++;
 }
 
