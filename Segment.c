@@ -17,6 +17,17 @@
 
 /******************* Function Implementation *******************/
 
+Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
+{
+	Segment* resSeg = initSegment(kernel); /* The returned result segment */
+	/*Creating a copy of our image with zeroes for tracking*/
+	BYTE** flag = createEmptyImg(img->rows, (img->cols) / BYTE_SIZE);
+
+	buildSegment(img, resSeg, threshold, &flag);
+
+	return resSeg;
+}
+
 treeNode** allocateTreeNodeList()
 {
 	treeNode** resTreeNodeList = (treeNode**)malloc(sizeof(treeNode*));
@@ -49,14 +60,12 @@ Segment* initSegment(imgPos rootPos)
 
 void appendChild(treeNode*** tnlst, treeNode* child)
 {
-	static int counter = 0;
 	ushort i = 0;
 	while ((*tnlst)[i++]);
 	*tnlst = (treeNode**)realloc(*tnlst, sizeof(treeNode*) * (i + 1));
 	checkMemory(tnlst);
 	(*tnlst)[i - 1] = child;
 	(*tnlst)[i] = NULL;
-	counter++;
 }
 
 void appendNeighbor(treeNode* tn, treeNode* neighbor)
@@ -64,7 +73,7 @@ void appendNeighbor(treeNode* tn, treeNode* neighbor)
 	appendChild(&(tn->similar_neighbors), neighbor);
 }
 
-void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*** flag)
+void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*** flag, uint* size)
 {
 	short i, j;
 	imgPos potentialNeighborPos;
@@ -82,23 +91,24 @@ void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*
 				potentialNeighbor = initTreeNode(potentialNeighborPos);
 				appendNeighbor(tn, potentialNeighbor);
 				raiseFlag(flag, potentialNeighborPos);
+				(*size)++;
 			}
 		}
 	}
 }
 
-void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, uchar maxVal, BYTE*** flag)
+void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, uchar maxVal, BYTE*** flag, uint* size)
 {
 	ushort i = 0;
 	while (tnlst[i])
 	{
-		addChildren(img, tnlst[i], minVal, maxVal, flag);
+		addChildren(img, tnlst[i], minVal, maxVal, flag, size);
 		i++;
 	}
 	i = 0;
 	while (tnlst[i])
 	{
-		buildSegmentRec(img, tnlst[i]->similar_neighbors, minVal, maxVal, flag);
+		buildSegmentRec(img, tnlst[i]->similar_neighbors, minVal, maxVal, flag, size);
 		i++;
 	}
 }
@@ -113,16 +123,5 @@ void buildSegment(grayImage* img, Segment* seg, uchar threshold, BYTE*** flag)
 	appendChild(&tnlst, seg->root);
 	raiseFlag(flag, seg->root->position);
 
-	buildSegmentRec(img, tnlst, minVal, maxVal, flag);
-}
-
-Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
-{
-	Segment* resSeg = initSegment(kernel); /* The returned result segment */
-	/*Creating a copy of our image with zeroes for tracking*/
-	BYTE** flag = createEmptyImg(img->rows, (img->cols) / BYTE_SIZE);
-
-	buildSegment(img, resSeg, threshold, &flag);
-
-	return resSeg;
+	buildSegmentRec(img, tnlst, minVal, maxVal, flag, &(seg->size));
 }
