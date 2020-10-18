@@ -26,11 +26,12 @@ static void addToBeginningOfList(imgPosCellList* nodes, imgPosCell* node);
 static void addToEndOfList(imgPosCellList* nodes, imgPosCell* node);
 static void addToInnerPlaceInList(imgPosCell* prev, imgPosCell* node);
 static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag);
+static void addToListRec(imgPosCellList* nodes, treeNode* node, BYTE*** flag);
 static void addToList(imgPosCellList* nodes, imgPos position, BYTE ***flag);
 static void deleteFromBeginning(imgPosCell* node);
 
 /*Array functions*/
-static void addItemToArray(uint* size, uint* physize, imgPosCell**** segments, imgPosCell* curr);
+static void addItemToArray(uint* size, uint* physize, imgPosCell*** segments, imgPosCell* curr);
 
 /*Free functions*/
 static void freeflag(BYTE** flag, ushort rows);
@@ -61,7 +62,6 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		findMinKernel(&kernel, img, &flag);
 		minSegment = findSingleSegment(img, kernel, threshold);
 		curr = sortNeighbors(minSegment, &flag); 
-
 		/*Adding the segment to the array*/
 		addItemToArray(&size, &physize, segments, curr);
 	}
@@ -83,11 +83,29 @@ static imgPosCell* sortNeighbors(Segment* segment, BYTE*** flag)
 	imgPosCellList lst = makeEmptyList();
 	addToEmptyList(&lst, segment->root->position, flag);
 
-	ushort i, size = segment->size;
-	for (i = 0; i < size; i++)
-		addToList(&lst, segment->root->similar_neighbors[i]->position, flag);
+	ushort i = 0;
+	while (segment->root->similar_neighbors[i])
+	{
+		addToListRec(&lst, segment->root->similar_neighbors[i], flag);
+		i++;
+	}
 	
 	return lst.head;
+}
+
+static void addToListRec(imgPosCellList* nodes, treeNode* node, BYTE*** flag)
+{
+	ushort i = 0;
+	if (node)
+	{
+		addToList(nodes, node->position, flag);
+
+		while (node->similar_neighbors[i])
+		{
+			addToListRec(nodes, node->similar_neighbors[i], flag);
+			i++;
+		}
+	}
 }
 
 static imgPosCellList makeEmptyList()
@@ -96,6 +114,7 @@ static imgPosCellList makeEmptyList()
 	lst.head = lst.tail = NULL;
 	return lst;
 }
+
 
 static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 {
@@ -107,8 +126,7 @@ static void addToEmptyList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	node->next = node->prev = NULL;
 	nodes->head = nodes->tail = node;
 
-	(*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE] = setBit((*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE],
-		(node->position)[COLS] / BYTE_SIZE);
+	raiseFlag(flag, node->position);
 }
 
 static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
@@ -134,8 +152,7 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE*** flag)
 	else
 		addToInnerPlaceInList(prev, node);
 
-	(*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE] = setBit((*flag)[(node->position)[ROWS]][(node->position)[COLS] / BYTE_SIZE],
-		(node->position)[COLS] / BYTE_SIZE);
+	raiseFlag(flag, node->position);
 }
 
 static void addToBeginningOfList(imgPosCellList* nodes, imgPosCell* node)
@@ -143,6 +160,7 @@ static void addToBeginningOfList(imgPosCellList* nodes, imgPosCell* node)
 	node->next = nodes->head;
 	nodes->head->prev = node;
 	nodes->head = node;
+	nodes->head->prev = NULL;
 }
 
 static void addToEndOfList(imgPosCellList* nodes, imgPosCell* node)
@@ -150,6 +168,7 @@ static void addToEndOfList(imgPosCellList* nodes, imgPosCell* node)
 	node->prev = nodes->tail;
 	nodes->tail->next = node;
 	nodes->tail = node;
+	nodes->tail->next = NULL;
 }
 
 static void addToInnerPlaceInList(imgPosCell* prev, imgPosCell* node)
@@ -208,9 +227,9 @@ static void addItemToArray(uint* size, uint* physize,imgPosCell*** segments,imgP
 	{
 		*physize *= 2;
 		*segments = (imgPosCell**)realloc(*segments, *physize * sizeof(imgPosCell*));
-		checkMemory(**segments);
+		checkMemory(*segments);
 	}
-	*segments[*size] = curr;
+	(*segments)[*size] = curr;
 	(*size)++;
 }
 
