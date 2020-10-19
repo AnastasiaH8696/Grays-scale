@@ -14,6 +14,14 @@
 /***** TYPEDEFS *****/
 
 /******************* Static Function Prototypes *******************/
+static treeNode** allocateTreeNodeList();
+static treeNode* initTreeNode(imgPos rootPos);
+static Segment* initSegment(imgPos rootPos);
+static void appendChild(treeNode*** tnlst, treeNode* child);
+static void appendNeighbor(treeNode* tn, treeNode* neighbor);
+static void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*** flag, uint* size);
+static void buildSegment(grayImage* img, Segment* seg, uchar threshold, BYTE*** flag);
+static void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, uchar maxVal, BYTE*** flag, uint* size);
 
 /******************* Function Implementation *******************/
 
@@ -28,7 +36,7 @@ Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
 	return resSeg;
 }
 
-treeNode** allocateTreeNodeList()
+static treeNode** allocateTreeNodeList()
 {
 	treeNode** resTreeNodeList = (treeNode**)malloc(sizeof(treeNode*));
 	checkMemory(resTreeNodeList);
@@ -37,7 +45,7 @@ treeNode** allocateTreeNodeList()
 	return resTreeNodeList;
 }
 
-treeNode* initTreeNode(imgPos rootPos)
+static treeNode* initTreeNode(imgPos rootPos)
 {
 	treeNode* resTreeNode = (treeNode*)malloc(sizeof(treeNode));
 	checkMemory(resTreeNode);
@@ -48,7 +56,7 @@ treeNode* initTreeNode(imgPos rootPos)
 	return resTreeNode;
 }
 
-Segment* initSegment(imgPos rootPos)
+static Segment* initSegment(imgPos rootPos)
 {
 	Segment* resSeg = (Segment*)malloc(sizeof(Segment));
 	checkMemory(resSeg);
@@ -58,7 +66,7 @@ Segment* initSegment(imgPos rootPos)
 	return resSeg;
 }
 
-void appendChild(treeNode*** tnlst, treeNode* child)
+static void appendChild(treeNode*** tnlst, treeNode* child)
 {
 	ushort i = 0;
 	while ((*tnlst)[i++]);
@@ -68,12 +76,12 @@ void appendChild(treeNode*** tnlst, treeNode* child)
 	(*tnlst)[i] = NULL;
 }
 
-void appendNeighbor(treeNode* tn, treeNode* neighbor)
+static void appendNeighbor(treeNode* tn, treeNode* neighbor)
 {
 	appendChild(&(tn->similar_neighbors), neighbor);
 }
 
-void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*** flag, uint* size)
+static void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*** flag, uint* size)
 {
 	short i, j;
 	imgPos potentialNeighborPos;
@@ -101,7 +109,7 @@ void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*
 	}
 }
 
-void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, uchar maxVal, BYTE*** flag, uint* size)
+static void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, uchar maxVal, BYTE*** flag, uint* size)
 {
 	ushort i = 0;
 	while (tnlst[i])
@@ -117,7 +125,7 @@ void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, uchar maxVa
 	}
 }
 
-void buildSegment(grayImage* img, Segment* seg, uchar threshold, BYTE*** flag)
+static void buildSegment(grayImage* img, Segment* seg, uchar threshold, BYTE*** flag)
 {
 	uchar pixelVal = img->pixels[seg->root->position[ROWS]][seg->root->position[COLS]];
 	uchar minVal = threshold > pixelVal ? MIN_VAL : pixelVal - threshold;
