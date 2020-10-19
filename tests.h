@@ -9,4 +9,6 @@
 
 /******************* Function Prototypes *******************/
 void e2eTest();
+void readNonExistPGMFileTest();
+void readWrongPGMVersionFileTest();
 #endif

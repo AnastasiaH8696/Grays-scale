@@ -27,3 +27,15 @@ void e2eTest()
 	grayImage* newImg = colorSegments(img, segments, numOfSegments);
 	saveCompressed("compressed.bin", newImg, 32);
 }
+
+void readNonExistPGMFileTest()
+{
+	char* nonExistPGMFilePath = "nonexist.pgm";
+	grayImage* img = readPGM(nonExistPGMFilePath);
+}
+
+void readWrongPGMVersionFileTest()
+{
+	char* nonExistPGMFilePath = "p5file.pgm";
+	grayImage* img = readPGM(nonExistPGMFilePath);
+}
