@@ -30,7 +30,7 @@ grayImage* readPGM(char* fname)
 	checkMemory(res_grayImage);
 	FILE* pgmFile;
 	char version[3];
-	ushort maxVal;
+	int maxVal;
 	ushort row, col;
 	int val;
 	pgmFile = fopen(fname, "rb");
@@ -43,14 +43,14 @@ grayImage* readPGM(char* fname)
 	skipComments(pgmFile);
 	if(fscanf(pgmFile, "%hu", &res_grayImage->rows));
 	skipComments(pgmFile);
-	if(fscanf(pgmFile, "%hu", &maxVal));
+	if(fscanf(pgmFile, "%d", &maxVal));
 	fgetc(pgmFile);
 
 	res_grayImage->pixels = createEmptyImg(res_grayImage->rows, res_grayImage->cols);
 	for (row = 0; row < res_grayImage->rows; row++) {
 		for (col = 0; col < res_grayImage->cols; col++) {
 			if(fscanf(pgmFile, "%d", &val));
-			res_grayImage->pixels[row][col] = (int)(((double)val / (double)maxVal) * 255);
+			res_grayImage->pixels[row][col] = (char)(((double)val / (double)maxVal) * 255);
 		}
 	}
 

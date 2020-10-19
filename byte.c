@@ -17,12 +17,14 @@
 
 void raiseFlag(BYTE*** flag, imgPos pos)
 {
-	uchar bitToRaise = 1 << (BYTE_SIZE - (pos[COLS] % BYTE_SIZE) - 1);
-	(*flag)[pos[ROWS]][BYTE_SIZE - pos[COLS] / BYTE_SIZE] |= bitToRaise;
+	ushort byteToRaise = pos[COLS] / BYTE_SIZE;
+	ushort bitToRaise = 1 << (BYTE_SIZE - (pos[COLS] % BYTE_SIZE) - 1);
+	(*flag)[pos[ROWS]][byteToRaise] |= bitToRaise;
 }
 
 BOOL isFlagSet(BYTE*** flag, imgPos pos)
 {
+	ushort byteToCheck = pos[COLS] / BYTE_SIZE;
 	uchar bitToCheck = 1 << (BYTE_SIZE - (pos[COLS] % BYTE_SIZE) - 1);
-	return (*flag)[pos[ROWS]][BYTE_SIZE - pos[COLS] / BYTE_SIZE] & bitToCheck;
+	return ((*flag)[pos[ROWS]][byteToCheck]) & bitToCheck;
 }
