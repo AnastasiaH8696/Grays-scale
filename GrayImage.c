@@ -54,6 +54,8 @@ BOOL isAllCovered(BYTE*** img, ushort rows, ushort cols)
 
 		i++;
 		j = 0;
+		currPos[ROWS] = i;
+		currPos[COLS] = j;
 	}
 
 	return flag;
@@ -84,6 +86,8 @@ void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 		}
 		i++;
 		j = 0;
+		currPos[ROWS] = i;
+		currPos[COLS] = j;
 	}
 	raiseFlag(flag, *kernel);
 }
@@ -94,6 +98,7 @@ grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 	uint i, color;
 
 	grayImage* newImg = (grayImage*)malloc(sizeof(grayImage));
+	checkMemory(newImg);
 	newImg->cols = img->cols;
 	newImg->rows = img->rows;
 	newImg->pixels = createEmptyImg(newImg->rows, newImg->cols);
