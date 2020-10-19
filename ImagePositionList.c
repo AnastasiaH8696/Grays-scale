@@ -64,6 +64,7 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		curr = sortNeighbors(minSegment, &flag); 
 		/*Adding the segment to the array*/
 		addItemToArray(&size, &physize, segments, curr);
+		findNextMinValue(&kernel ,img);
 	}
 
 	/*Reallocate to the right size*/
