@@ -33,6 +33,7 @@ Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
 
 	buildSegment(img, resSeg, threshold, &flag);
 
+	freeflag(flag, img->rows);
 	return resSeg;
 }
 

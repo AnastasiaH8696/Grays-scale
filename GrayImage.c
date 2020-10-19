@@ -61,7 +61,7 @@ BOOL isAllCovered(BYTE*** img, ushort rows, ushort cols)
 
 void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 {
-	PIXEL min = img->pixels[(*kernel)[ROWS]][(*kernel)[COLS]];
+	PIXEL min = MAX_PIXEL;
 	ushort i = 0, j = 0;
 
 	imgPos currPos;
@@ -88,25 +88,6 @@ void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 	raiseFlag(flag, *kernel);
 }
 
-void findNextMinValue(imgPos* kernel, grayImage* img)
-{
-	ushort i = 0, j = 0;
-	while (i < img->rows)
-	{
-		while (j < img->cols)
-		{
-			if ((img->pixels[i][j] > img->pixels[(*kernel)[ROWS]][(*kernel)[COLS]]))
-			{
-				(*kernel)[ROWS] = i;
-				(*kernel)[COLS] = j;
-				return;
-			}
-			j++;
-		}
-		i++;
-		j = 0;
-	}
-}
 grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 {
 	imgPosCell* curr;
@@ -129,4 +110,12 @@ grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 	}
 
 	return newImg;
+}
+
+void freeflag(BYTE** flag, ushort rows)
+{
+	ushort i;
+	for (i = 0; i < rows; i++)
+		free(flag[i]);
+	free(flag);
 }

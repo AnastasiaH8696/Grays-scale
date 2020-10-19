@@ -15,4 +15,7 @@
 The function returns a pointer to the found segment. */
 Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold);
 
+/*Free functions*/
+void freeSegmentsArr(imgPosCell** segments, ushort size);
+
 #endif
