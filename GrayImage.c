@@ -39,7 +39,7 @@ BOOL isAllCovered(BYTE*** img, ushort rows, ushort cols)
 
 	imgPos currPos;
 	currPos[ROWS] = i;
-	currPos[COLS] = j * BYTE_SIZE;
+	currPos[COLS] = j;
 
 	while (flag && i < rows)
 	{
@@ -74,7 +74,7 @@ void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 	{
 		while (j < img->cols)
 		{
-			if ((img->pixels[i][j] < min) && !isFlagSet(flag, currPos))
+			if ((img->pixels[i][j] <= min) && !isFlagSet(flag, currPos))
 			{
 				min = img->pixels[i][j];
 				(*kernel)[ROWS] = i;
