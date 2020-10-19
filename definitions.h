@@ -8,7 +8,6 @@
 #define ALLOCATION_ERROR -1
 #define OPEN_FILE_ERROR -2
 #define FILE_VERSION_ERROR -3
-#define FILE_MEMORY_ERROR -4
 
 /* imgPos defines */
 #define ROWS 0
