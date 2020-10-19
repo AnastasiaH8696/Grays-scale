@@ -18,7 +18,7 @@
 
 /*Sorting functions*/
 static imgPosCell* sortNeighbors(Segment* segment, BYTE*** flag);
-static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size);
+static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size, uint* sizesArr);
 
 /*List basic functions*/
 static imgPosCellList makeEmptyList();
@@ -31,7 +31,8 @@ static void addToList(imgPosCellList* nodes, imgPos position, BYTE ***flag);
 static void deleteFromBeginning(imgPosCell* node);
 
 /*Array functions*/
-static void addItemToArray(uint* size, uint* physize, imgPosCell*** segments, imgPosCell* curr);
+static void addItemToArray(uint* size, uint* physize, imgPosCell*** segments, imgPosCell* curr,
+	uint** sizesArr, uint segmentSize);
 
 /*Other functions*/
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
@@ -45,6 +46,9 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	Segment* minSegment;
 	imgPos kernel = { 0,0 };
 	imgPosCell* curr;
+	/*Creating array for sizes*/
+	uint* sizesArr = (uint*)malloc(sizeof(uint) * physize);
+	checkMemory(*sizesArr);
 	/*Creating a copy of our image with zeroes for tracking*/
 	BYTE** flag = createEmptyImg(img->rows, (img->cols)/ BYTE_SIZE); 
 	/*Allocating memory for segments array*/
@@ -59,7 +63,9 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		minSegment = findSingleSegment(img, kernel, threshold);
 		curr = sortNeighbors(minSegment, &flag); 
 		/*Adding the segment to the array*/
-		addItemToArray(&size, &physize, segments, curr);
+		addItemToArray(&size, &physize, segments, curr, &sizesArr, minSegment->size);
+		free(minSegment->root);
+		free(minSegment);
 	}
 
 	/*Reallocate to the right size*/
@@ -69,8 +75,9 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		checkMemory(*segments);
 	}
 
-	sortSegments(img, threshold, segments, size);
+	sortSegments(img, threshold, segments, size, sizesArr);
 	freeflag(flag, img->rows);
+	free(sizesArr);
 	return size;
 }
 
@@ -188,11 +195,9 @@ static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode)
 	return flag;
 }
 
-static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size)
+static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments, uint size, uint* sizesArr)
 {
 	ushort i, j;
-	Segment* curr;
-	Segment *next;
 	imgPosCell* temp;
 	BOOL swapped;
 
@@ -201,10 +206,7 @@ static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments
 		swapped = FALSE;
 		for (j = 0; j < size - i - 1; j++)
 		{
-			curr = findSingleSegment(img, (*segments)[j]->position, threshold);
-			next = findSingleSegment(img, (*segments)[j+1]->position, threshold);
-
-			if (curr->size < next->size)
+			if (sizesArr[j] < sizesArr[j+1])
 			{
 				temp = (*segments)[j];
 				(*segments)[j] = (*segments)[j + 1];
@@ -217,15 +219,19 @@ static void sortSegments(grayImage* img, uchar threshold, imgPosCell*** segments
 	}
 }
 
-static void addItemToArray(uint* size, uint* physize,imgPosCell*** segments,imgPosCell* curr)
+static void addItemToArray(uint* size, uint* physize,imgPosCell*** segments,imgPosCell* curr,
+	uint **sizesArr, uint segmentSize)
 {
 	if (*size == *physize)
 	{
 		*physize *= 2;
 		*segments = (imgPosCell**)realloc(*segments, *physize * sizeof(imgPosCell*));
 		checkMemory(*segments);
+		*sizesArr = (uint*)realloc(*sizesArr, *physize * sizeof(uint));
+		checkMemory(*sizesArr);
 	}
 	(*segments)[*size] = curr;
+	(*sizesArr)[*size] = segmentSize;
 	(*size)++;
 }
 
@@ -240,7 +246,12 @@ void freeSegmentsArr(imgPosCell** segments, ushort size)
 
 static void deleteFromBeginning(imgPosCell* node)
 {
-	node = node->next;
-	free(node->prev);
-	node->prev = NULL;
+	imgPosCell* nodeToDel;
+	while (node)
+	{
+		nodeToDel = node;
+		node = node->next;
+		node->prev = NULL;
+		free(nodeToDel);
+	}
 }
