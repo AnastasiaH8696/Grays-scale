@@ -85,13 +85,17 @@ void addChildren(grayImage* img, treeNode* tn, uchar minVal, uchar maxVal, BYTE*
 		{
 			potentialNeighborPos[ROWS] = tn->position[ROWS] + i;
 			potentialNeighborPos[COLS] = tn->position[COLS] + j;
-			potentialNeighborVal = img->pixels[potentialNeighborPos[ROWS]][potentialNeighborPos[COLS]];
-			if ((minVal <= potentialNeighborVal && maxVal >= potentialNeighborVal) && !isFlagSet(flag, potentialNeighborPos))
+			if (potentialNeighborPos[ROWS] >= 0 && potentialNeighborPos[ROWS] < img->rows \
+				&& potentialNeighborPos[COLS] >= 0 && potentialNeighborPos[COLS] < img->cols) /* Validate we're in a valid position*/
 			{
-				potentialNeighbor = initTreeNode(potentialNeighborPos);
-				appendNeighbor(tn, potentialNeighbor);
-				raiseFlag(flag, potentialNeighborPos);
-				(*size)++;
+				potentialNeighborVal = img->pixels[potentialNeighborPos[ROWS]][potentialNeighborPos[COLS]];
+				if ((minVal <= potentialNeighborVal && maxVal >= potentialNeighborVal) && !isFlagSet(flag, potentialNeighborPos))
+				{
+					potentialNeighbor = initTreeNode(potentialNeighborPos);
+					appendNeighbor(tn, potentialNeighbor);
+					raiseFlag(flag, potentialNeighborPos);
+					(*size)++;
+				}
 			}
 		}
 	}
