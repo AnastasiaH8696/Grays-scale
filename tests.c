@@ -26,6 +26,7 @@ void e2eTest()
 	int numOfSegments = findAllSegments(img, 10, &segments);
 	grayImage* newImg = colorSegments(img, segments, numOfSegments);
 	saveCompressed("compressed.bin", newImg, 32);
+	//freeSegmentsArr(segments, numOfSegments);
 }
 
 void readNonExistPGMFileTest()

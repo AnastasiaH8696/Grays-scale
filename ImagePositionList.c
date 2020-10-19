@@ -33,10 +33,6 @@ static void deleteFromBeginning(imgPosCell* node);
 /*Array functions*/
 static void addItemToArray(uint* size, uint* physize, imgPosCell*** segments, imgPosCell* curr);
 
-/*Free functions*/
-static void freeflag(BYTE** flag, ushort rows);
-static void freeSegmentsArr(imgPosCell** segments, ushort size);
-
 /*Other functions*/
 static BOOL isBigger(imgPosCell* maxNode, imgPosCell* minNode);
 
@@ -64,7 +60,6 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 		curr = sortNeighbors(minSegment, &flag); 
 		/*Adding the segment to the array*/
 		addItemToArray(&size, &physize, segments, curr);
-		findNextMinValue(&kernel ,img);
 	}
 
 	/*Reallocate to the right size*/
@@ -234,15 +229,7 @@ static void addItemToArray(uint* size, uint* physize,imgPosCell*** segments,imgP
 	(*size)++;
 }
 
-static void freeflag(BYTE** flag, ushort rows)
-{
-	ushort i;
-	for (i = 0; i < rows; i++)
-		free(flag[i]);
-	free(flag);
-}
-
-static void freeSegmentsArr(imgPosCell** segments, ushort size)
+void freeSegmentsArr(imgPosCell** segments, ushort size)
 {
 	ushort i;
 	for (i = 0; i < size; i++)
