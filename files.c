@@ -31,10 +31,7 @@ grayImage* readPGM(char* fname)
 	ushort row, col;
 	int val;
 	pgmFile = fopen(fname, "rb");
-	if (pgmFile == NULL) {
-		fprintf(stderr, "Cannot open the file");
-		exit(OPEN_FILE_ERROR);
-	}
+	checkFileOpening(pgmFile);
 	fgets(version, sizeof(version), pgmFile);
 	if (!strcmp(version, "P5")) {
 		fprintf(stderr, "Wrong file version!\n");
@@ -85,7 +82,7 @@ void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels)
 	compressed = compress(img, reducedGrayLevels, size, pow);
 
 	FILE* f = fopen(fileName, "wb");
-	checkFileMemory(f);
+	checkFileOpening(f);
 
 	fwrite(&(img->rows), sizeof(ushort), 1, f);
 	fwrite(&(img->rows), sizeof(ushort), 1, f);
@@ -95,13 +92,13 @@ void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels)
 	fclose(f);
 }
 
-void checkFileMemory(void* ptr)
+void checkFileOpening(void* ptr)
 {
 	if (ptr == NULL)
 	{
 		fprintf(stderr, "File memory failure");
-		exit(FILE_MEMORY_ERROR);
 		fclose(ptr);
+		exit(OPEN_FILE_ERROR);
 	}
 }
 
@@ -147,4 +144,70 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 	}
 
 	return compressed;
+}
+
+uchar readNBits(uchar byte, ushort n, ushort startPoint)
+{
+	uchar mask = ((uchar)1 << (n + 1)) - 1;
+	return ((byte >> (BYTE_SIZE - (n - startPoint))) & mask);
+}
+
+void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bitSize, ushort rows, ushort cols)
+{
+	ushort i, j;
+	ushort numOfReads = (rows * cols) * bitSize / BYTE_SIZE;
+	uchar byteVal, pixelVal;
+	ushort readInByte = 0; /* Indicates how many bits already read in the current byte */
+	for (i = 0; i < numOfReads; i++)
+	{
+		if (readInByte = 0) /* If we need to read another byte */
+		{
+			fseek(inputFile, (i * bitSize / BYTE_SIZE), SEEK_SET);
+			fread(&byteVal, sizeof(char), 1, inputFile);
+		}
+		if ((BYTE_SIZE - readInByte) >= bitSize) /* If the whole pixel is inside of the current byte */
+		{
+			pixelVal = readNBits(byteVal, bitSize, readInByte);
+			fprintf(outputFile, "%d ", pixelVal);
+			readInByte = (readInByte + bitSize) % BYTE_SIZE;
+		}
+		else /* The pixel stored in two separated bytes */
+		{
+			ushort leftToRead;
+			pixelVal = readNBits(byteVal, BYTE_SIZE - readInByte, readInByte);
+			leftToRead = bitSize - BYTE_SIZE + readInByte;
+			pixelVal << (bitSize - 1);
+			fread(&byteVal, sizeof(char), 1, inputFile);
+			readInByte = 0;
+			pixelVal |= readNBits(byteVal, leftToRead, readInByte);
+			fprintf(outputFile, "%d ", pixelVal);
+			readInByte = (readInByte + leftToRead) % BYTE_SIZE;
+		}
+	}
+}
+
+static void setFileHeader(FILE* inputFile, FILE* outputFile, ushort* rows, ushort* cols, uchar* grayLevels) {
+
+	fread(cols, sizeof(unsigned short), 1, inputFile);
+	fread(rows, sizeof(unsigned short), 1, inputFile);
+	fread(grayLevels, sizeof(unsigned char), 1, inputFile);
+
+	fprintf(outputFile, "P2\n%hu %hu\n%hhu\n", *rows, *cols, 255);
+}
+
+void convertCompressedImageToPGM(char* compressed_file_name, char* pgm_file_name)
+{
+	FILE *inputFile, *outputFile;
+	ushort rows, cols;
+	uchar grayLevels;
+
+	inputFile = fopen(compressed_file_name, "rb");
+	checkFileOpening(inputFile);
+	outputFile = fopen(pgm_file_name, "wb");
+	checkFileOpening(outputFile);
+
+	setFileHeader(inputFile, outputFile, &rows, &cols, &grayLevels);
+	decompressFileIntoOther(inputFile, outputFile,grayLevels, rows, cols);
+	fclose(inputFile);
+	fclose(outputFile);
 }
