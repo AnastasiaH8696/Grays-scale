@@ -56,7 +56,7 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	checkMemory(*segments);
 	
 	/*The loop is running until all the segments are covered by the flag*/
-	while (!isAllCovered(flag, img->cols, (img->rows)/ BYTE_SIZE))
+	while (!isAllCovered(flag, img->rows, (img->cols)/ BYTE_SIZE))
 	{
 		/*Finding segment and adding it to the imgPosList sorted by location*/
 		findMinKernel(&kernel, img, &flag);

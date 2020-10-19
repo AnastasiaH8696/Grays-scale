@@ -21,7 +21,7 @@
 /******************* Function Implementation *******************/
 void e2eTest()
 {
-	grayImage* img = readPGM("dragon.ascii.pgm");
+	grayImage* img = readPGM("feep.ascii.pgm");
 	imgPosCell** segments;
 	int numOfSegments = findAllSegments(img, 10, &segments);
 	grayImage* newImg = colorSegments(img, segments, numOfSegments);
