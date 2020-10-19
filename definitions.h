@@ -81,6 +81,7 @@ typedef struct _segment
 
 /******************* Function Prototypes *******************/
 
+/* Memory allocation check */
 void checkMemory(void* ptr);
 void checkFileOpening(void* ptr, char* fileName);
 void checkPGMVersion(char* version);

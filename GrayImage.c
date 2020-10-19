@@ -32,18 +32,24 @@ BYTE** createEmptyImg(ushort rows, ushort cols)
 	return emptyImg;
 }
 
-BOOL isAllCovered(BYTE** img, ushort rows, ushort cols)
+BOOL isAllCovered(BYTE*** img, ushort rows, ushort cols)
 {
 	BOOL flag = TRUE;
 	ushort i = 0, j = 0;
+
+	imgPos currPos;
+	currPos[ROWS] = i;
+	currPos[COLS] = j;
 
 	while (flag && i < rows)
 	{
 		while (j < cols)
 		{
-			if (!isBitSet(img[i][j], j));
+			if (!isFlagSet(flag, currPos));
 				flag = FALSE;
 			j++;
+			currPos[ROWS] = i;
+			currPos[COLS] = j;
 		}
 
 		i++;

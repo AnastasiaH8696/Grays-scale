@@ -14,17 +14,6 @@
 /******************* Static Function Prototypes *******************/
 
 /******************* Function Implementation *******************/
-BOOL isBitSet(uchar ch, int i)
-{
-	uchar mask = 1 << i;
-	return ch & mask;
-}
-
-uchar setBit(uchar ch, int i)
-{
-	uchar mask = 1 << i;
-	return ch | mask;
-}
 
 void raiseFlag(BYTE*** flag, imgPos pos)
 {

@@ -11,6 +11,8 @@
 
 /******************* Function Prototypes *******************/
 
+/* This function getting a pointer to an image, threshold and segments array and it updates the segments array with values
+and returns the size of the array */
 uint findAllSegments(grayImage* img, unsigned char threshold,
 	imgPosCell*** segments);
 
