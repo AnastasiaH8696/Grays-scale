@@ -66,7 +66,7 @@ void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 	{
 		while (j < img->cols)
 		{
-			if ((img->pixels[i][j] <= min) && !isFlagSet(flag, currPos))
+			if ((img->pixels[i][j] < min) && !isFlagSet(flag, currPos))
 			{
 				min = img->pixels[i][j];
 				(*kernel)[ROWS] = i;
@@ -82,6 +82,25 @@ void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 	raiseFlag(flag, *kernel);
 }
 
+void findNextMinValue(imgPos* kernel, grayImage* img)
+{
+	ushort i = 0, j = 0;
+	while (i < img->rows)
+	{
+		while (j < img->cols)
+		{
+			if ((img->pixels[i][j] > img->pixels[(*kernel)[ROWS]][(*kernel)[COLS]]))
+			{
+				(*kernel)[ROWS] = i;
+				(*kernel)[COLS] = j;
+				return;
+			}
+			j++;
+		}
+		i++;
+		j = 0;
+	}
+}
 grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size)
 {
 	imgPosCell* curr;
