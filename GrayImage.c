@@ -43,9 +43,9 @@ BOOL isAllCovered(BYTE*** img, ushort rows, ushort cols)
 
 	while (flag && i < rows)
 	{
-		while (j < cols)
+		while (flag && j < cols)
 		{
-			if (!isFlagSet(img, currPos));
+			if (isFlagSet(img, currPos) == 0)
 				flag = FALSE;
 			j++;
 			currPos[ROWS] = i;
