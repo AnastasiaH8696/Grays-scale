@@ -10,7 +10,7 @@
 /******************* Function Prototypes *******************/
 
 BYTE** createEmptyImg(ushort rows, ushort cols);
-BOOL isAllCovered(BYTE** img, ushort cols, ushort rows);
+BOOL isAllCovered(BYTE** img, ushort rows, ushort cols);
 void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag);
 grayImage* colorSegments(grayImage* img, imgPosCell** segments, uint size);
 
