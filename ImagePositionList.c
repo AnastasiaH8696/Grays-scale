@@ -47,7 +47,7 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 {
 	uint size = 0, physize = 1;
 	Segment* minSegment;
-	imgPos kernel;
+	imgPos kernel = { 0,0 };
 	imgPosCell* curr;
 	/*Creating a copy of our image with zeroes for tracking*/
 	BYTE** flag = createEmptyImg(img->rows, (img->cols)/ BYTE_SIZE); 
@@ -96,7 +96,7 @@ static imgPosCell* sortNeighbors(Segment* segment, BYTE*** flag)
 static void addToListRec(imgPosCellList* nodes, treeNode* node, BYTE*** flag)
 {
 	ushort i = 0;
-	if (node)
+	if (node && (!isFlagSet(flag, node->position)))
 	{
 		addToList(nodes, node->position, flag);
 

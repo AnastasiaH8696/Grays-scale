@@ -27,9 +27,6 @@ BYTE** createEmptyImg(ushort rows, ushort cols)
 	{
 		(emptyImg)[i] = (BYTE*)calloc(cols, sizeof(BYTE));
 		checkMemory((emptyImg)[i]);
-
-		for (j = 0; j < cols; j++)
-			(emptyImg)[i][0] = '\0';
 	}
 
 	return emptyImg;
@@ -58,22 +55,26 @@ BOOL isAllCovered(BYTE** img, ushort rows, ushort cols)
 
 void findMinKernel(imgPos* kernel, grayImage* img, BYTE*** flag)
 {
-	PIXEL min = img->pixels[0][0];
-	(*kernel)[ROWS] = 0;
-	(*kernel)[COLS] = 0;
+	PIXEL min = img->pixels[(*kernel)[ROWS]][(*kernel)[COLS]];
 	ushort i = 0, j = 0;
+
+	imgPos currPos;
+	currPos[ROWS] = i;
+	currPos[COLS] = j;
 
 	while (i < img->rows)
 	{
 		while (j < img->cols)
 		{
-			if ((img->pixels[i][j] < min) && !isBitSet((*flag)[i][j / 8], j / 8))
+			if ((img->pixels[i][j] <= min) && !isFlagSet(flag, currPos))
 			{
 				min = img->pixels[i][j];
 				(*kernel)[ROWS] = i;
 				(*kernel)[COLS] = j;
 			}
 			j++;
+			currPos[ROWS] = i;
+			currPos[COLS] = j;
 		}
 		i++;
 		j = 0;
