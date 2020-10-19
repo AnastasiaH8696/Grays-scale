@@ -34,12 +34,10 @@ grayImage* readPGM(char* fname)
 	ushort row, col;
 	int val;
 	pgmFile = fopen(fname, "rb");
-	checkFileOpening(pgmFile);
+	checkFileOpening(pgmFile, fname);
 	fgets(version, sizeof(version), pgmFile);
-	if (!strcmp(version, "P5")) {
-		fprintf(stderr, "Wrong file version!\n");
-		exit(FILE_VERSION_ERROR);
-	}
+	checkPGMVersion(version);
+
 	skipComments(pgmFile);
 	if (fscanf(pgmFile, "%hu", &res_grayImage->cols));
 	skipComments(pgmFile);
@@ -85,7 +83,7 @@ void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels)
 	compressed = compress(img, reducedGrayLevels, size, pow);
 
 	FILE* f = fopen(fileName, "wb");
-	checkFileOpening(f);
+	checkFileOpening(f, fileName);
 
 	fwrite(&(img->rows), sizeof(ushort), 1, f);
 	fwrite(&(img->rows), sizeof(ushort), 1, f);
@@ -195,9 +193,9 @@ void convertCompressedImageToPGM(char* compressed_file_name, char* pgm_file_name
 	uchar grayLevels;
 
 	inputFile = fopen(compressed_file_name, "rb");
-	checkFileOpening(inputFile);
+	checkFileOpening(inputFile, compressed_file_name);
 	outputFile = fopen(pgm_file_name, "wb");
-	checkFileOpening(outputFile);
+	checkFileOpening(outputFile, pgm_file_name);
 
 	setFileHeader(inputFile, outputFile, &rows, &cols, &grayLevels);
 	decompressFileIntoOther(inputFile, outputFile,grayLevels, rows, cols);

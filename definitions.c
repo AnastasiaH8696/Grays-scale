@@ -18,11 +18,19 @@ void checkMemory(void* ptr)
 	}
 }
 
-void checkFileOpening(void* ptr)
+void checkFileOpening(void* ptr, char* fileName)
 {
 	if (ptr == NULL)
 	{
-		fprintf(stderr, "File memory failure");
+		fprintf(stderr, "Error with opening the file: %s\n", fileName);
 		exit(OPEN_FILE_ERROR);
+	}
+}
+
+void checkPGMVersion(char* version)
+{
+	if (!strcmp(version, "P5")) {
+		fprintf(stderr, "Wrong file version!\nPlease use files in P2 format\n");
+		exit(FILE_VERSION_ERROR);
 	}
 }

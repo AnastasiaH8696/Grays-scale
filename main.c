@@ -13,4 +13,8 @@
 int main()
 {
 	e2eTest();
+	/*
+	readNonExistPGMFileTest();
+	readWrongPGMVersionFileTest();
+	*/
 }
