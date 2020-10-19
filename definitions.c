@@ -17,3 +17,12 @@ void checkMemory(void* ptr)
 		exit(ALLOCATION_ERROR);
 	}
 }
+
+void checkFileOpening(void* ptr)
+{
+	if (ptr == NULL)
+	{
+		fprintf(stderr, "File memory failure");
+		exit(OPEN_FILE_ERROR);
+	}
+}

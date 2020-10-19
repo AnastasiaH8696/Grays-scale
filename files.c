@@ -19,6 +19,9 @@
 
 static ushort findPow(uchar reducedGrayLevels);
 static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, ushort bitSize);
+static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bitSize, ushort rows, ushort cols);
+static void setFileHeader(FILE* inputFile, FILE* outputFile, ushort* rows, ushort* cols, uchar* grayLevels);
+static uchar readNBits(uchar byte, ushort n, ushort startPoint);
 
 /******************* Function Implementation *******************/
 grayImage* readPGM(char* fname)
@@ -92,16 +95,6 @@ void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels)
 	fclose(f);
 }
 
-void checkFileOpening(void* ptr)
-{
-	if (ptr == NULL)
-	{
-		fprintf(stderr, "File memory failure");
-		fclose(ptr);
-		exit(OPEN_FILE_ERROR);
-	}
-}
-
 static ushort findPow(uchar reducedGrayLevels)
 {
 	ushort res = 1, base = 2, pow = 0;
@@ -146,13 +139,13 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 	return compressed;
 }
 
-uchar readNBits(uchar byte, ushort n, ushort startPoint)
+static uchar readNBits(uchar byte, ushort n, ushort startPoint)
 {
 	uchar mask = ((uchar)1 << (n + 1)) - 1;
 	return ((byte >> (BYTE_SIZE - (n - startPoint))) & mask);
 }
 
-void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bitSize, ushort rows, ushort cols)
+static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bitSize, ushort rows, ushort cols)
 {
 	ushort i, j;
 	ushort numOfReads = (rows * cols) * bitSize / BYTE_SIZE;
@@ -186,8 +179,8 @@ void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bitSize, 
 	}
 }
 
-static void setFileHeader(FILE* inputFile, FILE* outputFile, ushort* rows, ushort* cols, uchar* grayLevels) {
-
+static void setFileHeader(FILE* inputFile, FILE* outputFile, ushort* rows, ushort* cols, uchar* grayLevels)
+{
 	fread(cols, sizeof(unsigned short), 1, inputFile);
 	fread(rows, sizeof(unsigned short), 1, inputFile);
 	fread(grayLevels, sizeof(unsigned char), 1, inputFile);

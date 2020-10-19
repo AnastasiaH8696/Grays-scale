@@ -82,5 +82,6 @@ typedef struct _segment
 /******************* Function Prototypes *******************/
 
 void checkMemory(void* ptr);
+void checkFileOpening(void* ptr);
 
 #endif
