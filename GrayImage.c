@@ -39,13 +39,13 @@ BOOL isAllCovered(BYTE*** img, ushort rows, ushort cols)
 
 	imgPos currPos;
 	currPos[ROWS] = i;
-	currPos[COLS] = j;
+	currPos[COLS] = j * BYTE_SIZE;
 
 	while (flag && i < rows)
 	{
 		while (j < cols)
 		{
-			if (!isFlagSet(flag, currPos));
+			if (!isFlagSet(img, currPos));
 				flag = FALSE;
 			j++;
 			currPos[ROWS] = i;
