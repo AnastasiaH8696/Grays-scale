@@ -48,9 +48,9 @@ uint findAllSegments(grayImage* img, unsigned char threshold,
 	imgPosCell* curr;
 	/*Creating array for sizes*/
 	uint* sizesArr = (uint*)malloc(sizeof(uint) * physize);
-	checkMemory(*sizesArr);
+	checkMemory(sizesArr);
 	/*Creating a copy of our image with zeroes for tracking*/
-	BYTE** flag = createEmptyImg(img->rows, (img->cols)/ BYTE_SIZE); 
+	BYTE** flag = createEmptyImg(img->rows, ((img->cols)/ BYTE_SIZE)+1); 
 	/*Allocating memory for segments array*/
 	*segments = (imgPosCell**)malloc(sizeof(imgPosCell*) * physize);
 	checkMemory(*segments);

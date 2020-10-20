@@ -29,11 +29,12 @@ Segment* findSingleSegment(grayImage* img, imgPos kernel, uchar threshold)
 {
 	Segment* resSeg = initSegment(kernel); /* The returned result segment */
 	/*Creating a copy of our image with zeroes for tracking*/
-	BYTE** flag = createEmptyImg(img->rows, (img->cols) / BYTE_SIZE);
+	static BYTE** flag;
+	flag = createEmptyImg(img->rows, (img->cols) / BYTE_SIZE);
 
 	buildSegment(img, resSeg, threshold, &flag);
 
-	freeflag(flag, img->rows);
+	//freeflag(flag, img->rows);
 	return resSeg;
 }
 
@@ -129,7 +130,7 @@ static void buildSegmentRec(grayImage* img, treeNode** tnlst, uchar minVal, ucha
 static void buildSegment(grayImage* img, Segment* seg, uchar threshold, BYTE*** flag)
 {
 	uchar pixelVal = img->pixels[seg->root->position[ROWS]][seg->root->position[COLS]];
-	uchar minVal = threshold > pixelVal ? MIN_VAL : pixelVal - threshold;
+	uchar minVal = threshold > pixelVal ? MIN_VAL : (pixelVal - threshold);
 	uchar maxVal = threshold > MAX_VAL - pixelVal ? MAX_VAL : pixelVal + threshold;
 
 	treeNode** tnlst = allocateTreeNodeList();
