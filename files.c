@@ -123,7 +123,7 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 			{
 				compressed[byteIndex] |= (currPixel) >> (bitSize - freeSpace);
 				byteIndex++;
-				compressed[byteIndex] |= ((currPixel) << (BYTE_SIZE-bitSize)) + freeSpace;
+				compressed[byteIndex] |= ((currPixel) << ((BYTE_SIZE-bitSize) + freeSpace));
 				freeSpace = (BYTE_SIZE - bitSize) + freeSpace;
 			}
 			else
@@ -131,7 +131,16 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 				compressed[byteIndex] |= (currPixel) << (freeSpace - bitSize);
 				freeSpace = freeSpace - bitSize;
 			}
-			
+			if (freeSpace == 0)
+			{
+				byteIndex++;
+				freeSpace = BYTE_SIZE;
+			}
+		}
+		if (freeSpace == 0)
+		{
+			byteIndex++;
+			freeSpace = BYTE_SIZE;
 		}
 	}
 
@@ -163,7 +172,7 @@ static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bi
 		if ((BYTE_SIZE - readInByte) >= numOfBits) /* If the whole pixel is inside of the current byte */
 		{
 			pixelVal = (readNBits(byteVal, numOfBits, readInByte)) * MAX_PIXEL / (bitSize-1);
-			fprintf(outputFile, "%d ", pixelVal);
+			fprintf(outputFile, "%4d", pixelVal);
 			printCounter++;
 			readInByte = (readInByte + numOfBits) % BYTE_SIZE;
 		}
@@ -178,11 +187,11 @@ static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bi
 			readInByte = 0;
 			pixelVal |= readNBits(byteVal, leftToRead, readInByte);
 			pixelVal = pixelVal * MAX_PIXEL / (bitSize - 1);
-			fprintf(outputFile, "%d ", pixelVal);
+			fprintf(outputFile, "%4d", pixelVal);
 			printCounter++;
 			readInByte = (readInByte + leftToRead) % BYTE_SIZE;
 		}
-		if (printCounter % cols == 0)
+		if (printCounter % rows == 0)
 			fprintf(outputFile, "\n");
 	}
 }
