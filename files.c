@@ -82,15 +82,15 @@ void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels)
 	BYTE* compressed; 
 	compressed = compress(img, reducedGrayLevels, size, pow);
 
-	FILE* f = fopen(fileName, "wb");
-	checkFileOpening(f, fileName);
+	FILE* compressedFile = fopen(fileName, "wb");
+	checkFileOpening(compressedFile, fileName);
 
-	fwrite(&(img->rows), sizeof(ushort), 1, f);
-	fwrite(&(img->rows), sizeof(ushort), 1, f);
-	fwrite(&reducedGrayLevels, sizeof(uchar), 1, f);
-	fwrite(compressed, sizeof(BYTE), size, f);
+	fwrite(&(img->rows), sizeof(ushort), 1, compressedFile);
+	fwrite(&(img->cols), sizeof(ushort), 1, compressedFile);
+	fwrite(&reducedGrayLevels, sizeof(uchar), 1, compressedFile);
+	fwrite(compressed, sizeof(BYTE), size, compressedFile);
 	
-	fclose(f);
+	fclose(compressedFile);
 }
 
 static ushort findPow(uchar reducedGrayLevels)
@@ -151,7 +151,7 @@ static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bi
 	ushort readInByte = 0; /* Indicates how many bits already read in the current byte */
 	for (i = 0; i < numOfReads; i++)
 	{
-		if (readInByte = 0) /* If we need to read another byte */
+		if (readInByte == 0) /* If we need to read another byte */
 		{
 			fseek(inputFile, (i * bitSize / BYTE_SIZE), SEEK_SET);
 			fread(&byteVal, sizeof(char), 1, inputFile);
