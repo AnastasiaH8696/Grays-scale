@@ -139,41 +139,50 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 
 static uchar readNBits(uchar byte, ushort n, ushort startPoint)
 {
-	uchar mask = ((uchar)1 << (n + 1)) - 1;
-	return ((byte >> (BYTE_SIZE - (n - startPoint))) & mask);
+	uchar mask = ((uchar)1 << n) - 1;
+	return ((byte >> (BYTE_SIZE - (n + startPoint))) & mask);
 }
 
 static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bitSize, ushort rows, ushort cols)
 {
-	ushort i, j;
-	ushort numOfReads = (rows * cols) * bitSize / BYTE_SIZE;
+	ushort i = 0;
+	ushort numOfBits = findPow(bitSize);
+	ushort numOfReads = (rows * cols) * numOfBits / BYTE_SIZE;
+	ushort printCounter = 0;
 	uchar byteVal, pixelVal;
 	ushort readInByte = 0; /* Indicates how many bits already read in the current byte */
-	for (i = 0; i < numOfReads; i++)
+	while (i < numOfReads)
 	{
 		if (readInByte == 0) /* If we need to read another byte */
 		{
-			fseek(inputFile, (i * bitSize / BYTE_SIZE), SEEK_SET);
+			fseek(inputFile, 5 + (i * numOfBits / BYTE_SIZE), SEEK_SET);
 			fread(&byteVal, sizeof(char), 1, inputFile);
+			i++;
 		}
-		if ((BYTE_SIZE - readInByte) >= bitSize) /* If the whole pixel is inside of the current byte */
+		if ((BYTE_SIZE - readInByte) >= numOfBits) /* If the whole pixel is inside of the current byte */
 		{
-			pixelVal = readNBits(byteVal, bitSize, readInByte);
+			pixelVal = (readNBits(byteVal, numOfBits, readInByte)) * MAX_PIXEL / (bitSize-1);
 			fprintf(outputFile, "%d ", pixelVal);
-			readInByte = (readInByte + bitSize) % BYTE_SIZE;
+			printCounter++;
+			readInByte = (readInByte + numOfBits) % BYTE_SIZE;
 		}
 		else /* The pixel stored in two separated bytes */
 		{
 			ushort leftToRead;
-			pixelVal = readNBits(byteVal, BYTE_SIZE - readInByte, readInByte);
-			leftToRead = bitSize - BYTE_SIZE + readInByte;
-			pixelVal << (bitSize - 1);
+			pixelVal = (readNBits(byteVal, BYTE_SIZE - readInByte, readInByte));
+			leftToRead = numOfBits - BYTE_SIZE + readInByte;
+			pixelVal <<= leftToRead;
 			fread(&byteVal, sizeof(char), 1, inputFile);
+			i++;
 			readInByte = 0;
 			pixelVal |= readNBits(byteVal, leftToRead, readInByte);
+			pixelVal = pixelVal * MAX_PIXEL / (bitSize - 1);
 			fprintf(outputFile, "%d ", pixelVal);
+			printCounter++;
 			readInByte = (readInByte + leftToRead) % BYTE_SIZE;
 		}
+		if (printCounter % cols == 0)
+			fprintf(outputFile, "\n");
 	}
 }
 
