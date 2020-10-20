@@ -18,7 +18,7 @@
 /******************* Static Function Prototypes *******************/
 
 static ushort findPow(uchar reducedGrayLevels);
-static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, ushort bitSize);
+static BYTE* compress(grayImage* img, uchar reducedGrayLevels, uint size, ushort bitSize);
 static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bitSize, ushort rows, ushort cols);
 static void setFileHeader(FILE* inputFile, FILE* outputFile, ushort* rows, ushort* cols, uchar* grayLevels);
 static uchar readNBits(uchar byte, ushort n, ushort startPoint);
@@ -78,8 +78,8 @@ void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels)
 	ushort pow = findPow(reducedGrayLevels);
 
 	/*The formula: All the pixels * pow(size of each pixel) / 8(size of each byte) */
-	ushort bitsNum = ((img->cols * img->rows) * pow);
-	ushort size = (bitsNum % 8) ? ((bitsNum / BYTE_SIZE)+1) : (bitsNum / BYTE_SIZE);
+	uint bitsNum = ((img->cols * img->rows) * pow);
+	uint size = (bitsNum % 8) ? ((bitsNum / BYTE_SIZE)+1) : (bitsNum / BYTE_SIZE);
 	BYTE* compressed; 
 	compressed = compress(img, reducedGrayLevels, size, pow);
 
@@ -105,9 +105,10 @@ static ushort findPow(uchar reducedGrayLevels)
 	return pow;
 }
 
-static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, ushort bitSize)
+static BYTE* compress(grayImage* img, uchar reducedGrayLevels, uint size, ushort bitSize)
 {
-	ushort i, j, freeSpace = BYTE_SIZE, byteIndex = 0;
+	ushort i, j, freeSpace = BYTE_SIZE;
+	int byteIndex = 0;
 	uchar currPixel;
 
 	ushort div = (MAX_PIXEL + 1) / reducedGrayLevels;
