@@ -78,7 +78,8 @@ void saveCompressed(char* fileName, grayImage* img, uchar reducedGrayLevels)
 	ushort pow = findPow(reducedGrayLevels);
 
 	/*The formula: All the pixels * pow(size of each pixel) / 8(size of each byte) */
-	ushort size = ((img->cols * img->rows) * pow) / BYTE_SIZE;
+	ushort bitsNum = ((img->cols * img->rows) * pow);
+	ushort size = (bitsNum % 8) ? ((bitsNum / BYTE_SIZE)+1) : (bitsNum / BYTE_SIZE);
 	BYTE* compressed; 
 	compressed = compress(img, reducedGrayLevels, size, pow);
 
@@ -107,9 +108,9 @@ static ushort findPow(uchar reducedGrayLevels)
 static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, ushort bitSize)
 {
 	ushort i, j, freeSpace = BYTE_SIZE, byteIndex = 0;
-	ushort div = (MAX_PIXEL + 1) / reducedGrayLevels; /*The right div for finding compressed value*/
 	uchar currPixel;
 
+	ushort div = (MAX_PIXEL + 1) / reducedGrayLevels;
 	BYTE* compressed = (BYTE*)calloc(size, sizeof(BYTE));
 	checkMemory(compressed);
 
@@ -122,8 +123,8 @@ static BYTE* compress(grayImage* img, uchar reducedGrayLevels, ushort size, usho
 			{
 				compressed[byteIndex] |= (currPixel) >> (bitSize - freeSpace);
 				byteIndex++;
-				compressed[byteIndex] |= ((currPixel) << (BYTE_SIZE-bitSize)) + (bitSize - freeSpace);
-				freeSpace = (BYTE_SIZE - bitSize) + (bitSize - freeSpace);
+				compressed[byteIndex] |= ((currPixel) << (BYTE_SIZE-bitSize)) + freeSpace;
+				freeSpace = (BYTE_SIZE - bitSize) + freeSpace;
 			}
 			else
 			{
