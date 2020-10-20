@@ -20,6 +20,10 @@
 #define MIN_VAL 0
 #define MAX_VAL 255
 
+#define DEFAULT_THRESHOLD 10
+#define DEFAULT_REDUCED_GRAYSCALE 32
+#define IMAGES_PATH ".\\images\\"
+
 /***** TYPEDEFS *****/
 
 /**** unsigned typedefs *****/
