@@ -21,11 +21,12 @@
 /******************* Function Implementation *******************/
 void e2eTest()
 {
-	grayImage* img = readPGM("feep.ascii.pgm");
+	grayImage* img = readPGM("mario.pgm");
 	imgPosCell** segments;
 	int numOfSegments = findAllSegments(img, 10, &segments);
 	grayImage* newImg = colorSegments(img, segments, numOfSegments);
 	saveCompressed("compressed.bin", newImg, 32);
+	convertCompressedImageToPGM("compressed.bin", "readable_compressed.pgm");
 	//freeSegmentsArr(segments, numOfSegments);
 }
 
