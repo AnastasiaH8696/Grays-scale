@@ -165,7 +165,6 @@ static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bi
 	{
 		if (readInByte == 0) /* If we need to read another byte */
 		{
-			fseek(inputFile, 5 + (i * numOfBits / BYTE_SIZE), SEEK_SET);
 			fread(&byteVal, sizeof(char), 1, inputFile);
 			i++;
 		}
@@ -194,6 +193,9 @@ static void decompressFileIntoOther(FILE* inputFile, FILE* outputFile, ushort bi
 		if (printCounter % rows == 0)
 			fprintf(outputFile, "\n");
 	}
+	/* Print the ignored left pixel */
+	pixelVal = (readNBits(byteVal, numOfBits, readInByte)) * MAX_PIXEL / (bitSize - 1);
+	fprintf(outputFile, "%4d", pixelVal);
 }
 
 static void setFileHeader(FILE* inputFile, FILE* outputFile, ushort* rows, ushort* cols, uchar* grayLevels)
